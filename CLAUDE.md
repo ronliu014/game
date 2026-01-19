@@ -29,22 +29,44 @@ The project has completed comprehensive planning and documentation:
 - ⏳ Technical stack selection in progress
 - ⏳ Code implementation not yet started
 
-### Key Documentation
-All development must follow these specifications (in priority order):
+### 📚 Documentation Index
 
-1. **[Project Master Plan](docs/00_项目规划总纲.md)** ⭐⭐⭐ - Overall project guidance
-2. **[Directory Structure Standards](docs/02_目录结构规范.md)** ⭐⭐⭐ - File organization rules
-3. **[Documentation Standards](docs/03_文档编写规范.md)** ⭐⭐⭐ - Documentation format and templates
-4. **[Logging System Standards](docs/04_日志系统规范.md)** ⭐⭐⭐ - Logging requirements and implementation
-5. **[Development Standards](docs/05_开发规范.md)** ⭐⭐⭐ - Code style, workflow, and best practices
-6. **[Implementation Roadmap](docs/06_项目实施路线图.md)** ⭐⭐ - Development schedule and milestones
-7. **[Game Design Document](docs/派对游戏 - 修复电路板_设计文档.md)** - Original game design
-8. **[Technical Specification](docs/01_技术方案文档.md)** - Technical architecture (to be updated)
+**完整文档导航**: [docs/INDEX.md](docs/INDEX.md) ⭐ **必读** - 所有文档的索引和快速查找指南
 
-### Repository Contents
-- Comprehensive documentation system in `docs/`
-- UI mockups and visual assets in `docs/image/`
-- Project structure defined (awaiting implementation)
+#### 规范文档 (Specifications)
+所有规范文档位于 `docs/specifications/`，**强制遵守**：
+
+| 序号 | 文档名称 | 用途 | 优先级 |
+|------|---------|------|--------|
+| 00 | [项目规划总纲](docs/specifications/00_项目规划总纲.md) | 项目整体规划与指导原则 | ⭐⭐⭐ |
+| 01 | [技术方案文档](docs/specifications/01_技术方案文档.md) | 技术选型与架构设计 | ⭐⭐ |
+| 02 | [目录结构规范](docs/specifications/02_目录结构规范.md) | 文件组织与命名规则 | ⭐⭐⭐ |
+| 03 | [文档编写规范](docs/specifications/03_文档编写规范.md) | 文档格式与模板标准 | ⭐⭐⭐ |
+| 04 | [日志系统规范](docs/specifications/04_日志系统规范.md) | 日志记录标准与实现 | ⭐⭐⭐ |
+| 05 | [开发规范](docs/specifications/05_开发规范.md) | 代码风格与开发流程 | ⭐⭐⭐ |
+| 06 | [项目实施路线图](docs/specifications/06_项目实施路线图.md) | 开发计划与里程碑 | ⭐⭐ |
+
+#### 设计文档 (Design)
+游戏设计和系统设计文档位于 `docs/design/`：
+
+| 文档名称 | 用途 | 状态 |
+|---------|------|------|
+| [派对游戏 - 修复电路板](docs/design/派对游戏%20-%20修复电路板_设计文档.md) | 游戏核心玩法与系统设计 | ✅ 完成 |
+| UI设计规范 | UI/UX设计标准 | ⏳ 待创建 |
+| API接口文档 | 外部集成接口 | ⏳ 待创建 |
+
+#### 资源文档 (Assets)
+设计稿和可视化资源位于 `docs/assets/`：
+
+- **UI设计稿**: [docs/assets/image/](docs/assets/image/) (12张界面设计图)
+
+### 新成员必读顺序
+
+1. **[文档索引](docs/INDEX.md)** - 了解文档结构
+2. **[项目规划总纲](docs/specifications/00_项目规划总纲.md)** - 了解项目全貌
+3. **[开发规范](docs/specifications/05_开发规范.md)** - 掌握开发标准
+4. **[目录结构规范](docs/specifications/02_目录结构规范.md)** - 熟悉项目结构
+5. **[游戏设计文档](docs/design/派对游戏%20-%20修复电路板_设计文档.md)** - 理解游戏设计
 
 ## Game Design Key Points
 
