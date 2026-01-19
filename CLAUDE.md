@@ -36,14 +36,28 @@ The project has completed comprehensive planning and documentation:
 #### 规范文档 (Specifications)
 所有规范文档位于 `docs/specifications/`，**强制遵守**：
 
+**核心规范（必读）**：
+
 | 序号 | 文档名称 | 用途 | 优先级 |
 |------|---------|------|--------|
 | 00 | [项目规划总纲](docs/specifications/00_项目规划总纲.md) | 项目整体规划与指导原则 | ⭐⭐⭐ |
-| 01 | [技术方案文档](docs/specifications/01_技术方案文档.md) | 技术选型与架构设计 | ⭐⭐ |
 | 02 | [目录结构规范](docs/specifications/02_目录结构规范.md) | 文件组织与命名规则 | ⭐⭐⭐ |
 | 03 | [文档编写规范](docs/specifications/03_文档编写规范.md) | 文档格式与模板标准 | ⭐⭐⭐ |
 | 04 | [日志系统规范](docs/specifications/04_日志系统规范.md) | 日志记录标准与实现 | ⭐⭐⭐ |
 | 05 | [开发规范](docs/specifications/05_开发规范.md) | 代码风格与开发流程 | ⭐⭐⭐ |
+
+**设计标准规范（资源制作必读）**：
+
+| 序号 | 文档名称 | 用途 | 优先级 |
+|------|---------|------|--------|
+| 10 | [美术资源规范](docs/specifications/10_美术资源规范.md) | 美术资源技术标准、视觉风格、交付要求 | ⭐⭐ |
+| 11 | [音效资源规范](docs/specifications/11_音效资源规范.md) | 音频资源技术标准、音效风格、交付要求 | ⭐⭐ |
+
+**技术与实施文档**：
+
+| 序号 | 文档名称 | 用途 | 优先级 |
+|------|---------|------|--------|
+| 01 | [技术方案文档](docs/specifications/01_技术方案文档.md) | 技术选型与架构设计 | ⭐⭐ |
 | 06 | [项目实施路线图](docs/specifications/06_项目实施路线图.md) | 开发计划与里程碑 | ⭐⭐ |
 
 #### 设计文档 (Design)
@@ -62,11 +76,18 @@ The project has completed comprehensive planning and documentation:
 
 ### 新成员必读顺序
 
+**开发人员**：
 1. **[文档索引](docs/INDEX.md)** - 了解文档结构
 2. **[项目规划总纲](docs/specifications/00_项目规划总纲.md)** - 了解项目全貌
 3. **[开发规范](docs/specifications/05_开发规范.md)** - 掌握开发标准
 4. **[目录结构规范](docs/specifications/02_目录结构规范.md)** - 熟悉项目结构
 5. **[游戏设计文档](docs/design/派对游戏%20-%20修复电路板_设计文档.md)** - 理解游戏设计
+
+**美术/音效人员**：
+1. **[文档索引](docs/INDEX.md)** - 了解文档结构
+2. **[游戏设计文档](docs/design/派对游戏%20-%20修复电路板_设计文档.md)** - 理解游戏设计与风格
+3. **[美术资源规范](docs/specifications/10_美术资源规范.md)** - 美术制作标准（必读）
+4. **[音效资源规范](docs/specifications/11_音效资源规范.md)** - 音效制作标准（必读）
 
 ## Game Design Key Points
 
@@ -83,9 +104,22 @@ Levels are defined by:
 3. Intentionally rotated pieces (shown as black/clickable tiles)
 
 ### Visual & Audio Requirements
-- **Visual Effects**: Electrical current animation along connected paths, terminal glow-up on completion, celebratory particle effects
-- **Audio**: Gear rotation clicks, electrical hum on connection, victory fanfare
-- **BGM**: Reduce to 20% when game UI is active
+
+**IMPORTANT**: All art and audio assets MUST follow the specifications:
+- **Art Assets**: See [美术资源规范](docs/specifications/10_美术资源规范.md) for technical standards, steampunk visual style, file formats, and naming conventions
+- **Audio Assets**: See [音效资源规范](docs/specifications/11_音效资源规范.md) for audio formats, sound effect list, and music requirements
+
+**Visual Style**:
+- Industrial steampunk aesthetic with copper/brass elements
+- Tile size: 128×128 px (PNG with transparency)
+- Color palette: Copper tones (#B87333, #CD7F32, #8B4513)
+- Effects: Electrical current animation, terminal glow-up, particle effects
+
+**Audio Style**:
+- Industrial mechanical sounds (gear rotation, metal clicks)
+- SFX: 44.1kHz, 16-bit, Mono, WAV/OGG format
+- BGM: 44.1kHz, 16-bit, Stereo, seamless loop
+- BGM volume: Reduce to 20% when game UI is active
 
 ### Integration Requirements
 - Must be callable as standalone module from external systems
@@ -118,6 +152,18 @@ Levels are defined by:
    - Update docs with code changes
    - Use standardized templates
    - Include code examples
+
+5. **Art Assets**: Follow [Art Asset Standards](docs/specifications/10_美术资源规范.md)
+   - Use PNG format with transparency for sprites/UI
+   - Follow steampunk visual style (copper/brass tones)
+   - Tile size: 128×128 px, UI buttons with 3 states
+   - Naming: `[type]_[name]_[state].png` (e.g., `tile_power_source.png`)
+
+6. **Audio Assets**: Follow [Audio Asset Standards](docs/specifications/11_音效资源规范.md)
+   - SFX: 44.1kHz, 16-bit, Mono, ≤3s duration
+   - BGM: 44.1kHz, 16-bit, Stereo, 60-180s seamless loop
+   - Industrial steampunk sound style (mechanical, metallic)
+   - Naming: `sfx_[name].wav` or `bgm_[name].ogg`
 
 ### Architecture Principles (from specifications)
 - **Separation of Concerns**: Core logic (`src/core/`) must be independent of rendering
