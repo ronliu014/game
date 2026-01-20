@@ -1,0 +1,43 @@
+# Circuit Repair Game - Python Dependencies
+# Python Version: 3.8+
+# Conda Environment: Game (D:\anaconda3\envs\Game)
+
+# ============================================
+# Core Game Engine
+# ============================================
+pygame==2.5.2              # 2D game engine
+
+# ============================================
+# Data Processing
+# ============================================
+numpy==1.24.3              # Numerical computing (for grid operations)
+
+# ============================================
+# Image Processing
+# ============================================
+Pillow==10.0.0             # Image loading and manipulation
+
+# ============================================
+# Development Tools
+# ============================================
+# Code Quality
+black==23.7.0              # Code formatter
+isort==5.12.0              # Import sorter
+pylint==2.17.5             # Code linter
+mypy==1.4.1                # Static type checker
+flake8==6.0.0              # Style guide enforcement
+
+# Testing
+pytest==7.4.0              # Testing framework
+pytest-cov==4.1.0          # Coverage plugin
+pytest-mock==3.11.1        # Mocking plugin
+
+# Documentation
+sphinx==7.1.2              # Documentation generator
+sphinx-rtd-theme==1.3.0    # ReadTheDocs theme
+
+# ============================================
+# Optional Dependencies (Uncomment if needed)
+# ============================================
+# PyInstaller==5.13.0      # For building standalone executables
+# cx-Freeze==6.15.6        # Alternative packaging tool
