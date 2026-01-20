@@ -317,3 +317,33 @@ def get_relative_path(path: str, base: Optional[str] = None) -> Path:
     except ValueError:
         # 如果无法计算相对路径，返回绝对路径
         return target
+
+
+def safe_join_path(base: str, *paths: str) -> str:
+    """
+    安全地连接路径，防止路径遍历攻击
+
+    Args:
+        base: 基础目录
+        *paths: 要连接的路径部分
+
+    Returns:
+        str: 连接后的安全路径
+
+    Raises:
+        ValueError: 路径试图访问基础目录之外的位置
+
+    Example:
+        >>> safe_join_path('/base', 'data', 'levels', 'level_001.json')
+        '/base/data/levels/level_001.json'
+    """
+    base_path = Path(base).resolve()
+    target_path = base_path.joinpath(*paths).resolve()
+
+    # 检查目标路径是否在基础目录内
+    try:
+        target_path.relative_to(base_path)
+    except ValueError:
+        raise ValueError(f"Path {paths} is outside base directory '{base}'")
+
+    return str(target_path)

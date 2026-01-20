@@ -233,6 +233,10 @@ class FPSCounter:
         if len(self._frame_times) > self.sample_size:
             self._frame_times.pop(0)
 
+    def update(self) -> None:
+        """记录一帧（tick的别名方法）"""
+        self.tick()
+
     def get_fps(self) -> float:
         """
         获取当前FPS
