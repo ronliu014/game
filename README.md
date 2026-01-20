@@ -205,10 +205,12 @@ pytest --cov=src tests/
 
 ## 技术栈
 
-- **语言**: Python 3.8+
-- **游戏引擎**: Pygame 2.5+ (待确认)
-- **测试框架**: pytest
-- **代码质量**: black, pylint, mypy
+- **语言**: Python 3.13.11
+- **游戏引擎**: Pygame 2.6.1 ✅
+- **数值计算**: NumPy 2.4.1
+- **图像处理**: Pillow 12.1.0
+- **测试框架**: pytest 7.4.0
+- **代码质量**: black 23.7.0, pylint 2.17.5, mypy 1.4.1
 
 详细技术方案请参考：[技术方案文档](docs/specifications/01_技术方案文档.md)
 
