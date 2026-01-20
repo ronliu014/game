@@ -1,0 +1,48 @@
+{
+  "window": {
+    "width": 800,
+    "height": 600,
+    "title": "电路板修复游戏 - Circuit Repair Game",
+    "fps": 60,
+    "fullscreen": false,
+    "resizable": false
+  },
+  "grid": {
+    "default_size": 4,
+    "tile_size": 128,
+    "tile_padding": 4,
+    "min_size": 3,
+    "max_size": 8
+  },
+  "audio": {
+    "volume": 0.7,
+    "bgm_volume": 0.2,
+    "sfx_volume": 1.0,
+    "enabled": true
+  },
+  "animation": {
+    "rotation_duration_ms": 300,
+    "glow_duration_ms": 500,
+    "particle_lifetime_ms": 1000,
+    "easing": "ease_in_out"
+  },
+  "performance": {
+    "target_fps": 60,
+    "target_startup_time_ms": 2000,
+    "target_level_load_time_ms": 500,
+    "target_memory_mb": 100,
+    "log_interval_ms": 1000
+  },
+  "debug": {
+    "enabled": false,
+    "show_fps": true,
+    "show_grid": false,
+    "show_hitbox": false,
+    "log_level": "INFO"
+  },
+  "game": {
+    "auto_save": true,
+    "show_hints": true,
+    "show_tutorial": true
+  }
+}
