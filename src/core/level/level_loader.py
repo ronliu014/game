@@ -149,6 +149,45 @@ class LevelLoader:
             logger.error(f"Failed to load level from {filepath}: {e}")
             return None
 
+    def get_level_data(self, filepath: str) -> Optional[LevelData]:
+        """
+        获取关卡数据（不创建网格）
+
+        Args:
+            filepath: 关卡文件路径
+
+        Returns:
+            Optional[LevelData]: 解析的关卡数据，失败返回None
+
+        Example:
+            >>> loader = LevelLoader()
+            >>> data = loader.get_level_data("data/levels/level_001.json")
+            >>> if data:
+            ...     print(f"Level: {data.name}, Difficulty: {data.difficulty}")
+        """
+        try:
+            # 加载JSON数据
+            level_data = self._load_json(filepath)
+            if level_data is None:
+                return None
+
+            # 验证数据
+            if not self._validate_level_data(level_data):
+                logger.error(f"Invalid level data in {filepath}")
+                return None
+
+            # 解析数据
+            parsed_data = self._parse_level_data(level_data)
+            if parsed_data is None:
+                return None
+
+            logger.debug(f"Level data loaded: {parsed_data.name} (ID: {parsed_data.level_id})")
+            return parsed_data
+
+        except Exception as e:
+            logger.error(f"Failed to get level data from {filepath}: {e}")
+            return None
+
     def _load_json(self, filepath: str) -> Optional[Dict[str, Any]]:
         """
         加载JSON文件
