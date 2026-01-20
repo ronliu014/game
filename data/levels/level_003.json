@@ -1,0 +1,27 @@
+{
+  "level_id": "003",
+  "version": "1.0",
+  "name": "曲折路径",
+  "difficulty": 3,
+  "grid_size": 5,
+  "solution": {
+    "tiles": [
+      {"x": 0, "y": 0, "type": "power_source", "rotation": 0},
+      {"x": 1, "y": 0, "type": "straight", "rotation": 0},
+      {"x": 2, "y": 0, "type": "corner", "rotation": 90},
+      {"x": 2, "y": 1, "type": "straight", "rotation": 90},
+      {"x": 2, "y": 2, "type": "corner", "rotation": 270},
+      {"x": 3, "y": 2, "type": "straight", "rotation": 0},
+      {"x": 4, "y": 2, "type": "terminal", "rotation": 0}
+    ]
+  },
+  "initial_state": {
+    "rotated_tiles": [
+      {"x": 1, "y": 0, "rotation": 90},
+      {"x": 2, "y": 0, "rotation": 0},
+      {"x": 2, "y": 1, "rotation": 0},
+      {"x": 2, "y": 2, "rotation": 180},
+      {"x": 3, "y": 2, "rotation": 90}
+    ]
+  }
+}

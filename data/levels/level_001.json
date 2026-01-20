@@ -1,0 +1,21 @@
+{
+  "level_id": "001",
+  "version": "1.0",
+  "name": "初学者",
+  "difficulty": 1,
+  "grid_size": 4,
+  "solution": {
+    "tiles": [
+      {"x": 0, "y": 0, "type": "power_source", "rotation": 0},
+      {"x": 1, "y": 0, "type": "straight", "rotation": 0},
+      {"x": 2, "y": 0, "type": "straight", "rotation": 0},
+      {"x": 3, "y": 0, "type": "terminal", "rotation": 0}
+    ]
+  },
+  "initial_state": {
+    "rotated_tiles": [
+      {"x": 1, "y": 0, "rotation": 90},
+      {"x": 2, "y": 0, "rotation": 90}
+    ]
+  }
+}

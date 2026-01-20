@@ -1,0 +1,47 @@
+{
+  "level_id": "005",
+  "version": "1.0",
+  "name": "专家挑战",
+  "difficulty": 5,
+  "grid_size": 8,
+  "solution": {
+    "tiles": [
+      {"x": 0, "y": 0, "type": "power_source", "rotation": 0},
+      {"x": 1, "y": 0, "type": "straight", "rotation": 0},
+      {"x": 2, "y": 0, "type": "straight", "rotation": 0},
+      {"x": 3, "y": 0, "type": "corner", "rotation": 90},
+      {"x": 3, "y": 1, "type": "straight", "rotation": 90},
+      {"x": 3, "y": 2, "type": "corner", "rotation": 270},
+      {"x": 4, "y": 2, "type": "straight", "rotation": 0},
+      {"x": 5, "y": 2, "type": "corner", "rotation": 90},
+      {"x": 5, "y": 3, "type": "straight", "rotation": 90},
+      {"x": 5, "y": 4, "type": "straight", "rotation": 90},
+      {"x": 5, "y": 5, "type": "corner", "rotation": 180},
+      {"x": 4, "y": 5, "type": "straight", "rotation": 0},
+      {"x": 3, "y": 5, "type": "straight", "rotation": 0},
+      {"x": 2, "y": 5, "type": "corner", "rotation": 0},
+      {"x": 2, "y": 6, "type": "straight", "rotation": 90},
+      {"x": 2, "y": 7, "type": "corner", "rotation": 270},
+      {"x": 3, "y": 7, "type": "terminal", "rotation": 0}
+    ]
+  },
+  "initial_state": {
+    "rotated_tiles": [
+      {"x": 1, "y": 0, "rotation": 90},
+      {"x": 2, "y": 0, "rotation": 270},
+      {"x": 3, "y": 0, "rotation": 180},
+      {"x": 3, "y": 1, "rotation": 0},
+      {"x": 3, "y": 2, "rotation": 0},
+      {"x": 4, "y": 2, "rotation": 90},
+      {"x": 5, "y": 2, "rotation": 180},
+      {"x": 5, "y": 3, "rotation": 180},
+      {"x": 5, "y": 4, "rotation": 0},
+      {"x": 5, "y": 5, "rotation": 90},
+      {"x": 4, "y": 5, "rotation": 270},
+      {"x": 3, "y": 5, "rotation": 90},
+      {"x": 2, "y": 5, "rotation": 180},
+      {"x": 2, "y": 6, "rotation": 0},
+      {"x": 2, "y": 7, "rotation": 180}
+    ]
+  }
+}

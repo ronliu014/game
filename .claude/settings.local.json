@@ -8,7 +8,22 @@
       "Bash(git remote add:*)",
       "Bash(git branch:*)",
       "Bash(git push:*)",
-      "Bash(git pull:*)"
+      "Bash(git pull:*)",
+      "Bash(git mv:*)",
+      "Bash(tree:*)",
+      "Bash(git checkout:*)",
+      "Bash(git tag:*)",
+      "Bash(conda activate:*)",
+      "Bash(D:\\\\anaconda3\\\\envs\\\\Game\\\\python.exe:*)",
+      "Bash(/d/anaconda3/envs/Game/python.exe --version:*)",
+      "Bash(/d/anaconda3/envs/Game/python.exe -m pip install:*)",
+      "Bash(test:*)",
+      "Bash(/d/anaconda3/envs/Game/python.exe -m pytest tests/unit/test_logger.py -v)",
+      "Bash(/d/anaconda3/envs/Game/python.exe -m pytest:*)",
+      "Bash(D:/anaconda3/envs/Game/python.exe -m pytest:*)",
+      "Bash(D:/anaconda3/envs/Game/python.exe:*)",
+      "Bash(python -m pytest:*)",
+      "Bash(/d/anaconda3/envs/Game/python.exe:*)"
     ]
   }
 }

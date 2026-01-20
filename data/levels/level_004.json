@@ -1,0 +1,36 @@
+{
+  "level_id": "004",
+  "version": "1.0",
+  "name": "螺旋迷宫",
+  "difficulty": 4,
+  "grid_size": 6,
+  "solution": {
+    "tiles": [
+      {"x": 0, "y": 0, "type": "power_source", "rotation": 0},
+      {"x": 1, "y": 0, "type": "straight", "rotation": 0},
+      {"x": 2, "y": 0, "type": "straight", "rotation": 0},
+      {"x": 3, "y": 0, "type": "corner", "rotation": 90},
+      {"x": 3, "y": 1, "type": "straight", "rotation": 90},
+      {"x": 3, "y": 2, "type": "straight", "rotation": 90},
+      {"x": 3, "y": 3, "type": "corner", "rotation": 180},
+      {"x": 2, "y": 3, "type": "straight", "rotation": 0},
+      {"x": 1, "y": 3, "type": "corner", "rotation": 0},
+      {"x": 1, "y": 4, "type": "straight", "rotation": 90},
+      {"x": 1, "y": 5, "type": "corner", "rotation": 270},
+      {"x": 2, "y": 5, "type": "terminal", "rotation": 0}
+    ]
+  },
+  "initial_state": {
+    "rotated_tiles": [
+      {"x": 1, "y": 0, "rotation": 90},
+      {"x": 2, "y": 0, "rotation": 180},
+      {"x": 3, "y": 0, "rotation": 0},
+      {"x": 3, "y": 1, "rotation": 0},
+      {"x": 3, "y": 2, "rotation": 180},
+      {"x": 3, "y": 3, "rotation": 270},
+      {"x": 2, "y": 3, "rotation": 90},
+      {"x": 1, "y": 3, "rotation": 180},
+      {"x": 1, "y": 5, "rotation": 180}
+    ]
+  }
+}
