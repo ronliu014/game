@@ -26,7 +26,8 @@
       "Bash(/d/anaconda3/envs/Game/python.exe:*)",
       "Bash(pytest:*)",
       "Bash(find:*)",
-      "Bash(conda run -n Game python -m pytest:*)"
+      "Bash(conda run -n Game python -m pytest:*)",
+      "Bash(python:*)"
     ]
   }
 }

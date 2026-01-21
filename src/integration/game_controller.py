@@ -218,7 +218,7 @@ class GameController:
                 self._particle_system.emit_sparks(screen_pos[0], screen_pos[1], count=10)
 
             # Check if level is complete
-            if self._level_manager.is_level_complete():
+            if self._level_manager.is_level_completed():
                 self._on_level_complete()
 
     def _on_level_complete(self) -> None:
@@ -267,7 +267,7 @@ class GameController:
             self._draw_game()
 
         # Draw particles
-        surface = self._renderer.get_surface()
+        surface = self._renderer._screen
         if surface:
             self._particle_system.draw(surface)
 
@@ -292,14 +292,18 @@ class GameController:
                 if tile:
                     screen_pos = self._mouse_handler.grid_to_screen(row, col)
                     if screen_pos:
-                        # Draw tile sprite
-                        sprite_name = f"tile_{tile.tile_type.value}.png"
-                        self._renderer.draw_sprite(sprite_name, screen_pos[0], screen_pos[1],
-                                                   rotation=tile.rotation)
+                        # Load and draw tile sprite
+                        sprite_path = f"assets/sprites/tiles/tile_{tile.tile_type.value}.png"
+                        sprite = self._renderer._sprite_manager.load_sprite(sprite_path)
+                        if sprite:
+                            # Rotate sprite if needed
+                            if tile.rotation != 0:
+                                sprite = self._renderer._sprite_manager.get_rotated_sprite(sprite, tile.rotation)
+                            self._renderer.draw_sprite(sprite, screen_pos)
 
                         # Draw glow on terminal if connected
-                        if tile.tile_type.value == "terminal" and self._level_manager.is_level_complete():
-                            surface = self._renderer.get_surface()
+                        if tile.tile_type.value == "terminal" and self._level_manager.is_level_completed():
+                            surface = self._renderer._screen
                             if surface:
                                 self._glow_effect.draw_glow_circle(surface, screen_pos[0], screen_pos[1],
                                                                    radius=32, glow_radius=15)
