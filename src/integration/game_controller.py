@@ -93,9 +93,7 @@ class GameController:
             self._logger.error("Failed to initialize audio")
             return False
 
-        # Set initial state
-        self._state_machine.transition_to(GameState.INIT)
-
+        # State machine is already in INIT state, no need to transition
         self._logger.info("Game controller initialized")
         return True
 
@@ -138,9 +136,16 @@ class GameController:
 
         level_id = self._level_ids[self._current_level_index]
 
+        # Convert level_id to file path
+        # If level_id is just an ID (e.g., "level_001"), convert to full path
+        if not level_id.endswith('.json'):
+            level_path = f"data/levels/{level_id}.json"
+        else:
+            level_path = level_id
+
         self._state_machine.transition_to(GameState.LOADING)
 
-        if not self._level_manager.load_level(level_id):
+        if not self._level_manager.load_level(level_path):
             self._logger.error(f"Failed to load level: {level_id}")
             return False
 
@@ -176,8 +181,8 @@ class GameController:
         Args:
             event: Pygame event
         """
-        # Update input manager
-        self._input_manager.handle_event(event)
+        # Note: InputManager uses update() with a list of events, not individual events
+        # So we'll handle events directly here instead
 
         # Handle mouse clicks on tiles
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
@@ -279,7 +284,8 @@ class GameController:
             return
 
         # Draw grid tiles
-        rows, cols = grid.get_size()
+        rows = grid.grid_size
+        cols = grid.grid_size
         for row in range(rows):
             for col in range(cols):
                 tile = grid.get_tile(row, col)
