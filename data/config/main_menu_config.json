@@ -1,0 +1,119 @@
+{
+  "scene_name": "MainMenuScene",
+  "version": "1.0.0",
+  "description": "Main menu scene configuration",
+
+  "screen": {
+    "width": 800,
+    "height": 600,
+    "background_color": [30, 30, 40]
+  },
+
+  "title": {
+    "text": "电路修复游戏",
+    "font_size": 48,
+    "color": [255, 200, 100],
+    "position": {
+      "anchor": "top_center",
+      "margin_y": 50
+    }
+  },
+
+  "logo": {
+    "enabled": false,
+    "image_path": "assets/ui/logo/game_logo.png",
+    "width": 200,
+    "height": 200,
+    "position": {
+      "anchor": "top_center",
+      "margin_y": 150
+    }
+  },
+
+  "difficulty_selection": {
+    "label": {
+      "text": "选择难度：",
+      "font_size": 24,
+      "color": [200, 200, 200]
+    },
+    "buttons": {
+      "width": 150,
+      "height": 50,
+      "spacing": 20,
+      "font_size": 18,
+      "position_y_offset": -20,
+      "difficulties": [
+        {
+          "id": "easy",
+          "label": "简单 (60秒)",
+          "time_limit": 60
+        },
+        {
+          "id": "normal",
+          "label": "普通 (45秒)",
+          "time_limit": 45
+        },
+        {
+          "id": "hard",
+          "label": "困难 (30秒)",
+          "time_limit": 30
+        },
+        {
+          "id": "hell",
+          "label": "地狱 (15秒)",
+          "time_limit": 15
+        }
+      ],
+      "colors": {
+        "normal": {
+          "normal": [100, 100, 100],
+          "hover": [150, 150, 150],
+          "pressed": [80, 80, 80]
+        },
+        "selected": {
+          "normal": [100, 150, 100],
+          "hover": [120, 170, 120],
+          "pressed": [80, 130, 80]
+        }
+      }
+    }
+  },
+
+  "action_buttons": {
+    "width": 200,
+    "height": 60,
+    "spacing": 20,
+    "font_size": 24,
+    "position_y_offset": 80,
+    "buttons": [
+      {
+        "id": "start",
+        "label": "开始游戏",
+        "action": "start_game"
+      },
+      {
+        "id": "exit",
+        "label": "退出游戏",
+        "action": "exit_game"
+      }
+    ]
+  },
+
+  "audio": {
+    "bgm": {
+      "enabled": true,
+      "file": "assets/audio/music/menu_bgm.ogg",
+      "volume": 0.2,
+      "loop": true
+    },
+    "sfx": {
+      "button_click": "assets/audio/sfx/sfx_button_click.wav",
+      "button_hover": "assets/audio/sfx/sfx_button_hover.wav"
+    }
+  },
+
+  "keyboard_shortcuts": {
+    "start_game": ["RETURN", "SPACE"],
+    "exit_game": ["ESCAPE"]
+  }
+}
