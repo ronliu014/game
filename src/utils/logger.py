@@ -102,15 +102,24 @@ class GameLogger:
     @classmethod
     def _setup_default_logging(cls) -> None:
         """设置默认日志配置"""
+        # Generate log filename with timestamp
+        from datetime import datetime
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        log_filename = f'logs/game_{timestamp}.log'
+
         logging.basicConfig(
             level=logging.DEBUG,
             format='[%(asctime)s] [%(levelname)s] [%(name)s] [%(funcName)s:%(lineno)d] - %(message)s',
             datefmt='%Y-%m-%d %H:%M:%S',
             handlers=[
                 logging.StreamHandler(),
-                logging.FileHandler('logs/game.log', encoding='utf-8')
+                logging.FileHandler(log_filename, encoding='utf-8')
             ]
         )
+
+        # Log the log file location
+        logger = logging.getLogger(__name__)
+        logger.info(f"Log file created: {log_filename}")
 
     @staticmethod
     def get_logger(name: str) -> logging.Logger:

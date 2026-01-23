@@ -38,15 +38,11 @@ def parse_arguments():
     )
 
     parser.add_argument(
-        '--level',
+        '--difficulty',
         type=str,
-        help='Single level ID to play (e.g., level_001)'
-    )
-
-    parser.add_argument(
-        '--levels',
-        type=str,
-        help='Comma-separated level IDs to play (e.g., level_001,level_002)'
+        choices=['easy', 'normal', 'hard', 'hell'],
+        default='normal',
+        help='Difficulty level: easy, normal, hard, hell (default: normal)'
     )
 
     parser.add_argument(
@@ -75,24 +71,26 @@ def parse_arguments():
 
 def on_level_complete(stats: dict):
     """
-    Callback function called when all levels are completed.
+    Callback function called when game session ends.
 
     Args:
         stats: Game statistics dictionary
     """
     logger = GameLogger.get_logger(__name__)
     logger.info("=" * 50)
-    logger.info("🎉 ALL LEVELS COMPLETED! 🎉")
+    logger.info("🎮 GAME SESSION ENDED 🎮")
     logger.info("=" * 50)
-    logger.info(f"Levels completed: {stats.get('levels_completed', 0)}/{stats.get('total_levels', 0)}")
+    logger.info(f"Levels completed: {stats.get('levels_completed', 0)}")
+    logger.info(f"Difficulty: {stats.get('difficulty', 'unknown')}")
     logger.info(f"Total moves: {stats.get('total_moves', 0)}")
     logger.info(f"Final state: {stats.get('final_state', 'unknown')}")
     logger.info("=" * 50)
 
     print("\n" + "=" * 50)
-    print("🎉 CONGRATULATIONS! ALL LEVELS COMPLETED! 🎉")
+    print("🎮 GAME SESSION ENDED 🎮")
     print("=" * 50)
-    print(f"Levels completed: {stats.get('levels_completed', 0)}/{stats.get('total_levels', 0)}")
+    print(f"Levels completed: {stats.get('levels_completed', 0)}")
+    print(f"Difficulty: {stats.get('difficulty', 'unknown')}")
     print(f"Total moves: {stats.get('total_moves', 0)}")
     print("=" * 50)
 
@@ -119,32 +117,33 @@ def main():
     # Initialize configuration
     ConfigManager.initialize('data/config/game_config.json')
 
-    # Determine which levels to load
-    if args.level:
-        # Single level specified
-        level_ids = [args.level]
-    elif args.levels:
-        # Multiple levels specified
-        level_ids = [lvl.strip() for lvl in args.levels.split(',')]
-    else:
-        # Default: play all available levels
-        level_ids = ['level_001', 'level_002', 'level_003', 'level_004', 'level_005']
+    # Difficulty display names
+    difficulty_names = {
+        'easy': '简单 (Easy)',
+        'normal': '普通 (Normal)',
+        'hard': '困难 (Hard)',
+        'hell': '地狱 (Hell)'
+    }
 
     # Print welcome message
-    print("\n" + "=" * 50)
-    print("  CIRCUIT REPAIR GAME")
-    print("=" * 50)
-    print(f"Levels to play: {len(level_ids)}")
-    print(f"Window size: {args.width}x{args.height}")
-    print(f"Target FPS: {args.fps}")
-    print("=" * 50)
-    print("\nHow to play:")
-    print("  - Click on black tiles to rotate circuit pieces")
-    print("  - Connect the power source to the terminal")
-    print("  - Complete all levels to win!")
-    print("=" * 50 + "\n")
+    print("\n" + "=" * 60)
+    print("  电路修复游戏 - CIRCUIT REPAIR GAME")
+    print("=" * 60)
+    print(f"游戏模式: 无限关卡 (Infinite Mode)")
+    print(f"难度等级: {difficulty_names.get(args.difficulty, args.difficulty)}")
+    print(f"窗口大小: {args.width}x{args.height}")
+    print(f"目标帧率: {args.fps} FPS")
+    print("=" * 60)
+    print("\n玩法说明 (How to play):")
+    print("  - 点击黑色方块旋转电路元件")
+    print("    Click on black tiles to rotate circuit pieces")
+    print("  - 连接电源到终端完成关卡")
+    print("    Connect the power source to the terminal")
+    print("  - 无限关卡，挑战你的极限！")
+    print("    Infinite levels - challenge yourself!")
+    print("=" * 60 + "\n")
 
-    logger.info(f"Starting game with {len(level_ids)} levels: {level_ids}")
+    logger.info(f"Starting game in infinite mode with difficulty: {args.difficulty}")
 
     # Create game API
     game_api = GameAPI()
@@ -152,7 +151,7 @@ def main():
     # Start the game
     try:
         success = game_api.start_game(
-            level_ids=level_ids,
+            difficulty=args.difficulty,
             on_complete=on_level_complete,
             on_exit=on_game_exit,
             width=args.width,

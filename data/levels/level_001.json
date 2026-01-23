@@ -6,16 +6,34 @@
   "grid_size": 4,
   "solution": {
     "tiles": [
-      {"x": 0, "y": 0, "type": "power_source", "rotation": 0},
-      {"x": 1, "y": 0, "type": "straight", "rotation": 0},
-      {"x": 2, "y": 0, "type": "straight", "rotation": 0},
-      {"x": 3, "y": 0, "type": "terminal", "rotation": 0}
+      {"x": 0, "y": 0, "type": "power_source", "rotation": 90, "is_clickable": false},
+      {"x": 0, "y": 1, "type": "empty", "rotation": 0, "is_clickable": false},
+      {"x": 0, "y": 2, "type": "empty", "rotation": 0, "is_clickable": false},
+      {"x": 0, "y": 3, "type": "empty", "rotation": 0, "is_clickable": false},
+
+      {"x": 1, "y": 0, "type": "straight", "rotation": 90, "is_clickable": true, "accepted_rotations": [90, 270]},
+      {"x": 1, "y": 1, "type": "empty", "rotation": 0, "is_clickable": false},
+      {"x": 1, "y": 2, "type": "empty", "rotation": 0, "is_clickable": false},
+      {"x": 1, "y": 3, "type": "empty", "rotation": 0, "is_clickable": false},
+
+      {"x": 2, "y": 0, "type": "corner", "rotation": 0, "is_clickable": true, "accepted_rotations": [0]},
+      {"x": 2, "y": 1, "type": "straight", "rotation": 0, "is_clickable": true, "accepted_rotations": [0, 180]},
+      {"x": 2, "y": 2, "type": "straight", "rotation": 0, "is_clickable": true, "accepted_rotations": [0, 180]},
+      {"x": 2, "y": 3, "type": "corner", "rotation": 0, "is_clickable": true, "accepted_rotations": [0]},
+
+      {"x": 3, "y": 0, "type": "empty", "rotation": 0, "is_clickable": false},
+      {"x": 3, "y": 1, "type": "empty", "rotation": 0, "is_clickable": false},
+      {"x": 3, "y": 2, "type": "empty", "rotation": 0, "is_clickable": false},
+      {"x": 3, "y": 3, "type": "terminal", "rotation": 270, "is_clickable": false}
     ]
   },
   "initial_state": {
     "rotated_tiles": [
-      {"x": 1, "y": 0, "rotation": 90},
-      {"x": 2, "y": 0, "rotation": 90}
+      {"x": 1, "y": 0, "rotation": 0},
+      {"x": 2, "y": 0, "rotation": 90},
+      {"x": 2, "y": 1, "rotation": 90},
+      {"x": 2, "y": 2, "rotation": 180},
+      {"x": 2, "y": 3, "rotation": 180}
     ]
   }
 }

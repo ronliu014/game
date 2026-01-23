@@ -46,6 +46,20 @@ class ConnectivityChecker:
         """
         logger.debug("ConnectivityChecker initialized")
 
+    def _is_valid_position(self, grid: GridManager, x: int, y: int) -> bool:
+        """
+        检查坐标是否在网格范围内
+
+        Args:
+            grid: 网格管理器
+            x: x坐标
+            y: y坐标
+
+        Returns:
+            bool: 坐标是否有效
+        """
+        return 0 <= x < grid.grid_size and 0 <= y < grid.grid_size
+
     def check_connectivity(self, grid: GridManager) -> bool:
         """
         检查电源端到终端是否连通
@@ -127,6 +141,11 @@ class ConnectivityChecker:
             for direction in current.get_exit_directions():
                 # 获取邻居位置
                 neighbor_pos = current.get_neighbor_position(direction)
+
+                # 检查坐标是否在网格范围内
+                if not self._is_valid_position(grid, neighbor_pos[0], neighbor_pos[1]):
+                    continue
+
                 neighbor_tile = grid.get_tile(*neighbor_pos)
 
                 # 检查邻居是否有效
@@ -218,6 +237,11 @@ class ConnectivityChecker:
             # 遍历当前瓦片的所有出口方向
             for direction in current.get_exit_directions():
                 neighbor_pos = current.get_neighbor_position(direction)
+
+                # 检查坐标是否在网格范围内
+                if not self._is_valid_position(grid, neighbor_pos[0], neighbor_pos[1]):
+                    continue
+
                 neighbor_tile = grid.get_tile(*neighbor_pos)
 
                 # 检查邻居是否有效

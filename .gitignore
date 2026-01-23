@@ -100,6 +100,18 @@ desktop.ini
 # assets/temp/
 # assets/raw/
 
+# Temporary files directory
+temp/
+
+# Debug files
+debug_*.json
+nul
+
+# Test-generated level files
+data/levels/*_test.json
+data/levels/*_new.json
+data/levels/*_generated*.json
+
 # Documentation build
 docs/_build/
 docs/.doctrees/

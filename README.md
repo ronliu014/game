@@ -88,9 +88,23 @@ circuit-repair-game/
 │   │   ├── 03_文档编写规范.md
 │   │   ├── 04_日志系统规范.md
 │   │   ├── 05_开发规范.md
-│   │   └── 06_项目实施路线图.md
+│   │   ├── 06_项目实施路线图.md
+│   │   ├── 07_版本控制规范.md
+│   │   ├── 10_美术资源规范.md
+│   │   └── 11_音效资源规范.md
 │   ├── design/            # 设计文档
-│   │   └── 派对游戏 - 修复电路板_设计文档.md
+│   │   ├── 派对游戏 - 修复电路板_设计文档.md
+│   │   └── 30_关卡生成算法设计文档.md
+│   ├── development/       # 开发文档
+│   │   ├── ALGORITHM_V3_IMPLEMENTATION.md
+│   │   ├── INFINITE_MODE_GUIDE.md
+│   │   ├── MIGRATION_TO_INFINITE_MODE.md
+│   │   ├── V3_COMPLETION_REPORT.md
+│   │   ├── DESIGN_DOC_UPDATE_SUMMARY.md
+│   │   └── README_INFINITE_MODE.md
+│   ├── changelog/         # 版本记录
+│   │   └── CHANGELOG.md
+│   ├── archive/           # 归档文档
 │   └── assets/            # 资源文档
 │       └── image/         # UI设计稿
 ├── src/                    # 🔧 源代码
@@ -108,6 +122,7 @@ circuit-repair-game/
 │   └── config/            # 配置文件
 ├── tests/                 # 🧪 测试代码
 └── tools/                 # 🛠️ 开发工具
+    └── scripts/           # 辅助脚本
 ```
 
 详细目录结构请参考：[目录结构规范](docs/specifications/02_目录结构规范.md)
@@ -144,7 +159,7 @@ game.start_game(
 )
 ```
 
-详细API文档请参考：[API接口文档](docs/20_API接口文档.md)（开发中）
+详细API文档请参考：[API接口文档](docs/design/20_API接口文档.md)（开发中）
 
 ## 开发指南
 

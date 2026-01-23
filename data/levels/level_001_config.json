@@ -1,0 +1,8 @@
+{
+  "level_id": "001",
+  "name": "初学者",
+  "difficulty": "easy",
+  "grid_size": 4,
+  "min_path_length": 5,
+  "description": "简单的入门关卡"
+}

@@ -302,8 +302,13 @@ class LevelLoader:
             # 转换瓦片类型
             tile_type = TileType.from_string(tile_type_str)
 
-            # 创建瓦片（电源端和终端不可点击）
-            is_clickable = tile_type not in (TileType.POWER_SOURCE, TileType.TERMINAL)
+            # 读取is_clickable字段，如果没有则根据类型判断
+            if "is_clickable" in tile_data:
+                is_clickable = tile_data["is_clickable"]
+            else:
+                # 默认：电源端和终端不可点击，其他可点击
+                is_clickable = tile_type not in (TileType.POWER_SOURCE, TileType.TERMINAL, TileType.EMPTY)
+
             tile = Tile(x, y, tile_type, rotation, is_clickable)
 
             grid.set_tile(x, y, tile)

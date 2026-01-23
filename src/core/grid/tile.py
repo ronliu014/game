@@ -146,6 +146,15 @@ class Tile:
 
         Returns:
             List[Direction]: 基础出口方向列表
+
+        Note:
+            Straight tile at 0° or 180°: horizontal line (EAST-WEST, connects left-right)
+            Straight tile at 90° or 270°: vertical line (NORTH-SOUTH, connects up-down)
+            Corner tile at 0°: connects NORTH and EAST (L shape, opening right-up)
+
+            Coordinate system: (x, y) where x=row, y=column
+            - Same y value = same column = vertical arrangement = need vertical line (90°)
+            - Same x value = same row = horizontal arrangement = need horizontal line (0°)
         """
         if self.tile_type == TileType.EMPTY:
             return []
@@ -154,9 +163,11 @@ class Tile:
         elif self.tile_type == TileType.TERMINAL:
             return [Direction.WEST]
         elif self.tile_type == TileType.STRAIGHT:
+            # 0° straight: horizontal line (EAST-WEST, connects left-right)
             return [Direction.EAST, Direction.WEST]
         elif self.tile_type == TileType.CORNER:
-            return [Direction.EAST, Direction.SOUTH]
+            # 0° corner: connects NORTH and EAST (L shape, opening right-up)
+            return [Direction.NORTH, Direction.EAST]
         else:
             return []
 

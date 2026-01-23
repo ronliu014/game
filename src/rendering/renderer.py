@@ -218,7 +218,7 @@ class Renderer:
             position: (x, y) position (top-left corner)
             font_size: Font size in pixels
             color: RGB color tuple
-            font_name: Font name or path (uses default if None)
+            font_name: Font name or path (uses Chinese font if None)
 
         Example:
             >>> renderer.draw_text("Hello World", (100, 100))
@@ -229,11 +229,22 @@ class Renderer:
             return
 
         try:
+            # Use Microsoft YaHei for Chinese support if no font specified
+            if font_name is None:
+                font_name = "C:/WINDOWS/fonts/msyh.ttc"
+
             font = pygame.font.Font(font_name, font_size)
             text_surface = font.render(text, True, color)
             self._screen.blit(text_surface, position)
         except Exception as e:
             logger.error(f"Failed to draw text: {e}")
+            # Fallback to default font
+            try:
+                font = pygame.font.Font(None, font_size)
+                text_surface = font.render(text, True, color)
+                self._screen.blit(text_surface, position)
+            except Exception as e2:
+                logger.error(f"Failed to draw text with fallback font: {e2}")
 
     def draw_rect(
         self,

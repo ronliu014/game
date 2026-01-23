@@ -136,11 +136,12 @@ class Direction(Enum):
 
 
 # 方向向量（用于坐标计算）
+# x是行（向下增加），y是列（向右增加）
 DIRECTION_VECTORS: dict = {
-    Direction.NORTH: (0, -1),
-    Direction.EAST: (1, 0),
-    Direction.SOUTH: (0, 1),
-    Direction.WEST: (-1, 0),
+    Direction.NORTH: (-1, 0),  # 行减1，向上
+    Direction.EAST: (0, 1),    # 列加1，向右
+    Direction.SOUTH: (1, 0),   # 行加1，向下
+    Direction.WEST: (0, -1),   # 列减1，向左
 }
 
 

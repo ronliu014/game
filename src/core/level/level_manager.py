@@ -11,7 +11,7 @@ Author: Circuit Repair Game Team
 Date: 2026-01-20
 """
 
-from typing import Optional, List, Tuple
+from typing import Optional, List, Tuple, Dict, Any
 import logging
 
 from src.core.grid.grid_manager import GridManager
@@ -126,6 +126,102 @@ class LevelManager:
 
         return True
 
+    def load_generated_level(
+        self,
+        difficulty: str = "normal",
+        grid_size: Optional[int] = None,
+        level_number: int = 1
+    ) -> bool:
+        """
+        Load a procedurally generated level with difficulty support.
+
+        Uses the V3 generator which implements the user's algorithm specification.
+
+        Args:
+            difficulty: Difficulty level ("easy", "normal", "hard", "hell")
+            grid_size: Optional fixed grid size (overrides difficulty config)
+            level_number: Level number for display purposes
+
+        Returns:
+            True if level generated and loaded successfully
+
+        Example:
+            >>> manager.load_generated_level(difficulty="normal")
+            True
+            >>> manager.load_generated_level(difficulty="hard", grid_size=7)
+            True
+        """
+        from src.core.level.level_generator_v3 import LevelGeneratorV3
+        from src.core.level.difficulty_config import DifficultyLevel
+
+        # Convert string to DifficultyLevel enum
+        try:
+            difficulty_enum = DifficultyLevel(difficulty.lower())
+        except ValueError:
+            logger.error(f"Invalid difficulty: {difficulty}, defaulting to NORMAL")
+            difficulty_enum = DifficultyLevel.NORMAL
+
+        logger.info(
+            f"Generating level #{level_number}: difficulty={difficulty_enum.value}, "
+            f"grid_size={grid_size or 'auto'}"
+        )
+
+        # Generate level using V3 generator (implements user's algorithm)
+        generator = LevelGeneratorV3(
+            difficulty=difficulty_enum,
+            grid_size=grid_size
+        )
+
+        try:
+            generated = generator.generate()
+        except RuntimeError as e:
+            logger.error(f"Failed to generate level: {e}")
+            return False
+
+        # Create LevelData from generated data
+        difficulty_names = {
+            "easy": "简单",
+            "normal": "普通",
+            "hard": "困难",
+            "hell": "地狱"
+        }
+        difficulty_display = difficulty_names.get(difficulty_enum.value, difficulty_enum.value)
+
+        level_data = LevelData(
+            level_id=f"generated_{level_number}",
+            version="1.0",
+            name=f"关卡 #{level_number} ({difficulty_display})",
+            difficulty=list(DifficultyLevel).index(difficulty_enum) + 1,
+            grid_size=generated['grid_size'],
+            solution_tiles=generated['solution'],
+            rotated_tiles=generated['initial_state']
+        )
+
+        # Create grid using LevelLoader's internal method
+        grid = self._level_loader._create_grid(level_data)
+        if grid is None:
+            logger.error("Failed to create grid from generated level")
+            return False
+
+        # Initialize components
+        self._level_data = level_data
+        self._current_level_id = level_data.level_id
+        self._current_filepath = None  # No file for generated levels
+        self._grid = grid
+        self._connectivity_checker = ConnectivityChecker()
+        self._move_count = 0
+        self._is_completed = False
+
+        logger.info(
+            f"Generated level loaded: {level_data.name} "
+            f"(Grid: {generated['grid_size']}x{generated['grid_size']}, "
+            f"Path length: {len(generated['path'])}, "
+            f"Movable: {generated['movable_count']}, "
+            f"Corners: {generated['corner_count']})"
+        )
+
+        return True
+
     def reset_level(self) -> bool:
         """
         Reset current level to initial state.
@@ -200,8 +296,10 @@ class LevelManager:
         """
         Check if current level is completed.
 
-        A level is completed when there is a valid path from power source
-        to terminal. Updates completion status if level is completed.
+        A level is completed when all clickable tiles match their solution
+        rotation angles. For straight tiles, equivalent rotations are accepted:
+        - 0° is equivalent to 180°
+        - 90° is equivalent to 270°
 
         Returns:
             True if level is completed, False otherwise
@@ -210,24 +308,96 @@ class LevelManager:
             >>> manager.load_level("data/levels/level_001.json")
             >>> manager.check_win_condition()
             False
-            >>> # ... rotate tiles to complete circuit ...
+            >>> # ... rotate tiles to match solution ...
             >>> manager.check_win_condition()
             True
         """
-        if self._grid is None or self._connectivity_checker is None:
+        if self._grid is None or self._level_data is None:
             logger.warning("Cannot check win condition: no level loaded")
             return False
 
-        is_connected = self._connectivity_checker.check_connectivity(self._grid)
+        # Check if all clickable tiles match their solution rotation
+        is_match = self._check_rotation_match()
 
-        if is_connected and not self._is_completed:
+        if is_match and not self._is_completed:
             self._is_completed = True
             logger.info(
                 f"Level completed: {self._current_level_id} "
                 f"(Moves: {self._move_count})"
             )
 
-        return is_connected
+        return is_match
+
+    def _check_rotation_match(self) -> bool:
+        """
+        Check if all clickable tiles match their accepted rotations.
+
+        Each tile in the solution can have an accepted_rotations list that
+        defines which rotation angles are considered correct. This allows
+        level designers full flexibility in defining puzzle solutions.
+
+        Returns:
+            True if all rotations match, False otherwise
+        """
+        if self._grid is None or self._level_data is None:
+            return False
+
+        # Build solution map: (x, y) -> accepted_rotations
+        solution_map: Dict[tuple, list] = {}
+        for tile_data in self._level_data.solution_tiles:
+            x = tile_data.get('x')
+            y = tile_data.get('y')
+            is_clickable = tile_data.get('is_clickable', False)
+            accepted_rotations = tile_data.get('accepted_rotations')
+
+            if is_clickable and x is not None and y is not None:
+                # If accepted_rotations not specified, default to single rotation
+                if accepted_rotations is None:
+                    accepted_rotations = [tile_data.get('rotation', 0)]
+                solution_map[(x, y)] = accepted_rotations
+
+        # Check each clickable tile
+        for pos, accepted_rotations in solution_map.items():
+            x, y = pos
+            tile = self._grid.get_tile(x, y)
+
+            if tile is None:
+                logger.debug(f"Tile at ({x}, {y}) not found")
+                return False
+
+            current_rotation = tile.rotation
+
+            # Check if current rotation is in accepted list
+            if not self._is_rotation_accepted(current_rotation, accepted_rotations):
+                logger.debug(
+                    f"Tile at ({x}, {y}) rotation mismatch: "
+                    f"current={current_rotation}°, accepted={accepted_rotations}"
+                )
+                return False
+
+        logger.debug("All tiles match accepted rotations")
+        return True
+
+    def _is_rotation_accepted(self, current: int, accepted_rotations: list) -> bool:
+        """
+        Check if current rotation is in the list of accepted rotations.
+
+        Args:
+            current: Current rotation angle
+            accepted_rotations: List of accepted rotation angles
+
+        Returns:
+            True if current rotation is accepted, False otherwise
+        """
+        # Normalize current angle to 0-359 range
+        current = current % 360
+
+        # Check if current rotation is in accepted list
+        for accepted in accepted_rotations:
+            if current == (accepted % 360):
+                return True
+
+        return False
 
     def get_move_count(self) -> int:
         """

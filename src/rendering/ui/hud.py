@@ -73,10 +73,16 @@ class HUD(UIComponent):
 
         # Font
         try:
-            self._font = pygame.font.Font(None, font_size)
+            # Use Microsoft YaHei for Chinese support
+            chinese_font = "C:/WINDOWS/fonts/msyh.ttc"
+            self._font = pygame.font.Font(chinese_font, font_size)
         except Exception as e:
-            logger.error(f"Failed to create font: {e}")
-            self._font = pygame.font.Font(None, 20)
+            logger.warning(f"Failed to load Chinese font, using default: {e}")
+            try:
+                self._font = pygame.font.Font(None, font_size)
+            except Exception as e2:
+                logger.error(f"Failed to create font: {e2}")
+                self._font = pygame.font.Font(None, 20)
 
         logger.debug(f"HUD created at ({x}, {y})")
 

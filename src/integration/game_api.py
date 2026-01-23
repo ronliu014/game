@@ -54,17 +54,17 @@ class GameAPI:
         self._logger: GameLogger = GameLogger.get_logger(__name__)
 
     def start_game(self,
-                   level_ids: List[str],
+                   difficulty: str = "normal",
                    on_complete: Optional[Callable[[Dict[str, Any]], None]] = None,
                    on_exit: Optional[Callable[[], None]] = None,
                    width: int = 800,
                    height: int = 600,
                    fps: int = 60) -> bool:
         """
-        Start the game with specified levels.
+        Start the game with infinite procedurally generated levels.
 
         Args:
-            level_ids: List of level IDs to play (e.g., ["level_001", "level_002"])
+            difficulty: Difficulty level ("easy", "normal", "hard", "hell")
             on_complete: Callback function called when all levels are completed.
                         Receives a dict with game statistics.
             on_exit: Callback function called when game exits (user closes window)
@@ -82,15 +82,11 @@ class GameAPI:
                 print(f"Total moves: {stats['total_moves']}")
 
             api.start_game(
-                level_ids=["level_001", "level_002"],
+                difficulty="normal",
                 on_complete=on_complete
             )
             ```
         """
-        if not level_ids:
-            self._logger.error("No level IDs provided")
-            return False
-
         # Store callbacks
         self._on_complete_callback = on_complete
         self._on_exit_callback = on_exit
@@ -103,9 +99,9 @@ class GameAPI:
             self._logger.error("Failed to initialize game controller")
             return False
 
-        # Load levels
-        if not self._controller.load_levels(level_ids):
-            self._logger.error("Failed to load levels")
+        # Start game with infinite level generation
+        if not self._controller.start_game(difficulty=difficulty):
+            self._logger.error("Failed to start game")
             self._controller.shutdown()
             return False
 
@@ -142,14 +138,14 @@ class GameAPI:
                 - is_running (bool): Whether game is running
                 - current_state (str): Current game state
                 - current_level (int): Current level number (1-indexed)
-                - total_levels (int): Total number of levels
+                - difficulty (str): Current difficulty level
                 - move_count (int): Moves in current level
                 - fps (float): Current FPS
 
         Example:
             ```python
             status = api.get_status()
-            print(f"Level {status['current_level']}/{status['total_levels']}")
+            print(f"Level #{status['current_level']} ({status['difficulty']})")
             print(f"Moves: {status['move_count']}")
             ```
         """
@@ -158,7 +154,7 @@ class GameAPI:
                 "is_running": False,
                 "current_state": "not_started",
                 "current_level": 0,
-                "total_levels": 0,
+                "difficulty": "normal",
                 "move_count": 0,
                 "fps": 0.0
             }
@@ -168,8 +164,8 @@ class GameAPI:
         return {
             "is_running": self._game_loop.is_running(),
             "current_state": self._controller.get_state().value,
-            "current_level": self._controller._current_level_index + 1,
-            "total_levels": len(self._controller._level_ids),
+            "current_level": self._controller._current_level_number,
+            "difficulty": self._controller.get_difficulty(),
             "move_count": level_manager.get_move_count() if level_manager else 0,
             "fps": self._game_loop.get_fps()
         }
@@ -179,19 +175,7 @@ class GameAPI:
         if not self._controller:
             return
 
-        # Check if all levels were completed
-        state = self._controller.get_state()
-        all_completed = (state == GameState.VICTORY and
-                        self._controller._current_level_index >= len(self._controller._level_ids) - 1)
-
-        if all_completed and self._on_complete_callback:
-            # Gather statistics
-            stats = self._gather_statistics()
-            try:
-                self._on_complete_callback(stats)
-            except Exception as e:
-                self._logger.error(f"Error in completion callback: {e}")
-
+        # In infinite mode, game never "completes" - only exits
         # Call exit callback
         if self._on_exit_callback:
             try:
@@ -217,8 +201,8 @@ class GameAPI:
         level_manager = self._controller.get_level_manager()
 
         return {
-            "levels_completed": self._controller._current_level_index + 1,
-            "total_levels": len(self._controller._level_ids),
+            "levels_completed": self._controller._current_level_number,
+            "difficulty": self._controller.get_difficulty(),
             "total_moves": level_manager.get_move_count() if level_manager else 0,
             "final_state": self._controller.get_state().value
         }

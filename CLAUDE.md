@@ -131,24 +131,24 @@ Levels are defined by:
 ### MANDATORY: Follow All Standards
 **All code implementation MUST strictly adhere to the project specifications:**
 
-1. **Code Style**: Follow [Development Standards](docs/05_开发规范.md)
+1. **Code Style**: Follow [Development Standards](docs/specifications/05_开发规范.md)
    - PEP 8 compliance
    - Type annotations required
    - Unit test coverage ≥80%
    - All public APIs must have docstrings
 
-2. **File Organization**: Follow [Directory Structure Standards](docs/02_目录结构规范.md)
+2. **File Organization**: Follow [Directory Structure Standards](docs/specifications/02_目录结构规范.md)
    - Organize by function, not file type
    - Use standardized naming conventions
    - Maximum 4 directory levels
 
-3. **Logging**: Follow [Logging System Standards](docs/04_日志系统规范.md)
+3. **Logging**: Follow [Logging System Standards](docs/specifications/04_日志系统规范.md)
    - Use structured logging format
    - Log all critical operations
    - Performance logging required
    - No sensitive information in logs
 
-4. **Documentation**: Follow [Documentation Standards](docs/03_文档编写规范.md)
+4. **Documentation**: Follow [Documentation Standards](docs/specifications/03_文档编写规范.md)
    - Update docs with code changes
    - Use standardized templates
    - Include code examples
@@ -178,11 +178,11 @@ Levels are defined by:
 - **State Management**: Proper game state machine implementation
 
 ### Level Data Format
-See [Implementation Roadmap](docs/06_项目实施路线图.md) Section 4.2.3 for detailed JSON schema.
+See [Implementation Roadmap](docs/specifications/06_项目实施路线图.md) Section 4.2.3 for detailed JSON schema.
 
 ## Standard Directory Structure
 
-**MUST follow this structure** (see [Directory Structure Standards](docs/02_目录结构规范.md) for complete details):
+**MUST follow this structure** (see [Directory Structure Standards](docs/specifications/02_目录结构规范.md) for complete details):
 
 ```
 circuit-repair-game/
@@ -217,7 +217,7 @@ circuit-repair-game/
 
 ## Technology Stack
 
-**Recommended**: Python + Pygame (see [Implementation Roadmap](docs/06_项目实施路线图.md) Section 2.2.1)
+**Recommended**: Python + Pygame (see [Implementation Roadmap](docs/specifications/06_项目实施路线图.md) Section 2.2.1)
 
 **Rationale**:
 - Matches existing conda environment (Game)
@@ -238,4 +238,4 @@ Before starting implementation:
 5. ⏳ Initialize Git repository
 6. ⏳ Begin Stage 1: Core Framework Development
 
-See [Implementation Roadmap](docs/06_项目实施路线图.md) for detailed development plan (8-12 weeks).
+See [Implementation Roadmap](docs/specifications/06_项目实施路线图.md) for detailed development plan (8-12 weeks).
