@@ -15,6 +15,7 @@ from src.ui.components.panel import Panel
 from src.ui.components.label import Label
 from src.ui.components.image import Image
 from src.ui.layouts.layout_manager import LayoutManager
+from src.progression.level_progression import LevelProgressionManager
 from src.utils.logger import GameLogger
 
 logger = GameLogger.get_logger(__name__)
@@ -61,13 +62,21 @@ class MainMenuScene(SceneBase):
         self._background_panel: Optional[Panel] = None
         self._title_label: Optional[Label] = None
         self._logo_image: Optional[Image] = None
+        self._progress_panel: Optional[Panel] = None
+        self._progress_label: Optional[Label] = None
+        self._stars_label: Optional[Label] = None
         self._difficulty_label: Optional[Label] = None
         self._difficulty_buttons: Dict[str, Button] = {}
         self._start_button: Optional[Button] = None
+        self._continue_button: Optional[Button] = None
+        self._new_game_button: Optional[Button] = None
         self._exit_button: Optional[Button] = None
 
         # Layout manager
         self._layout: Optional[LayoutManager] = None
+
+        # Progression manager
+        self._progression_manager: Optional[LevelProgressionManager] = None
 
         # State
         self._selected_difficulty = self.DIFFICULTY_NORMAL
@@ -90,9 +99,13 @@ class MainMenuScene(SceneBase):
         # Initialize layout manager
         self._layout = LayoutManager(self._screen_width, self._screen_height)
 
+        # Initialize progression manager
+        self._progression_manager = LevelProgressionManager()
+
         # Create UI components
         self._create_background()
         self._create_title()
+        self._create_progress_display()
         self._create_difficulty_selection()
         self._create_buttons()
 
@@ -132,6 +145,14 @@ class MainMenuScene(SceneBase):
         if self._title_label:
             self._title_label.draw(surface)
 
+        # Draw progress display
+        if self._progress_panel:
+            self._progress_panel.draw(surface)
+        if self._progress_label:
+            self._progress_label.draw(surface)
+        if self._stars_label:
+            self._stars_label.draw(surface)
+
         # Draw difficulty label
         if self._difficulty_label:
             self._difficulty_label.draw(surface)
@@ -163,6 +184,10 @@ class MainMenuScene(SceneBase):
 
         # Handle action button events
         if self._start_button and self._start_button.handle_event(event):
+            return True
+        if self._continue_button and self._continue_button.handle_event(event):
+            return True
+        if self._new_game_button and self._new_game_button.handle_event(event):
             return True
         if self._exit_button and self._exit_button.handle_event(event):
             return True
@@ -211,6 +236,54 @@ class MainMenuScene(SceneBase):
 
         # TODO: Load logo image when available
         # self._logo_image = Image(...)
+
+    def _create_progress_display(self) -> None:
+        """Create progress display panel."""
+        if not self._progression_manager:
+            return
+
+        # Get statistics
+        stats = self._progression_manager.get_statistics()
+
+        # Create progress panel
+        panel_width = 300
+        panel_height = 100
+        self._progress_panel = Panel(
+            self._screen_width - panel_width - 20,
+            20,
+            panel_width,
+            panel_height,
+            background_color=(40, 40, 50),
+            border_color=(100, 100, 100),
+            border_width=2,
+            alpha=220
+        )
+
+        # Create progress label
+        progress_text = f"进度: {stats['completed_levels']}/{stats['total_levels']} 关卡"
+        self._progress_label = Label(
+            self._screen_width - panel_width - 10,
+            30,
+            panel_width - 20,
+            30,
+            progress_text,
+            font_size=18,
+            text_color=(200, 200, 200),
+            alignment=Label.ALIGN_CENTER
+        )
+
+        # Create stars label
+        stars_text = f"★ {stats['total_stars']}/{stats['max_stars']}"
+        self._stars_label = Label(
+            self._screen_width - panel_width - 10,
+            65,
+            panel_width - 20,
+            30,
+            stars_text,
+            font_size=20,
+            text_color=(255, 215, 0),
+            alignment=Label.ALIGN_CENTER
+        )
 
     def _create_difficulty_selection(self) -> None:
         """Create difficulty selection UI."""
@@ -274,19 +347,40 @@ class MainMenuScene(SceneBase):
         self._update_difficulty_buttons()
 
     def _create_buttons(self) -> None:
-        """Create action buttons (Start, Exit)."""
+        """Create action buttons (Continue, New Game, Exit)."""
         button_width = 200
         button_height = 60
 
-        # Create start button
-        self._start_button = Button(
+        # Check if there's existing progress
+        has_progress = False
+        if self._progression_manager:
+            stats = self._progression_manager.get_statistics()
+            has_progress = stats['completed_levels'] > 0
+
+        buttons = []
+
+        # Create continue button if there's progress
+        if has_progress:
+            self._continue_button = Button(
+                0, 0,
+                button_width,
+                button_height,
+                "继续游戏",
+                on_click=self._on_continue_clicked,
+                font_size=24
+            )
+            buttons.append(self._continue_button)
+
+        # Create new game button
+        self._new_game_button = Button(
             0, 0,
             button_width,
             button_height,
-            "开始游戏",
-            on_click=self._on_start_clicked,
+            "新游戏" if has_progress else "开始游戏",
+            on_click=self._on_new_game_clicked,
             font_size=24
         )
+        buttons.append(self._new_game_button)
 
         # Create exit button
         self._exit_button = Button(
@@ -297,10 +391,11 @@ class MainMenuScene(SceneBase):
             on_click=self._on_exit_clicked,
             font_size=24
         )
+        buttons.append(self._exit_button)
 
         # Arrange buttons vertically
         self._layout.arrange_vertical(
-            [self._start_button, self._exit_button],
+            buttons,
             start_y=self._screen_height // 2 + 80,
             spacing=20,
             center_horizontal=True
@@ -337,15 +432,35 @@ class MainMenuScene(SceneBase):
                     Button.STATE_DISABLED: (60, 60, 60)
                 })
 
-    def _on_start_clicked(self) -> None:
-        """Handle start button click."""
-        logger.info(f"Starting game with difficulty: {self._selected_difficulty}")
+    def _on_continue_clicked(self) -> None:
+        """Handle continue button click."""
+        if not self._progression_manager:
+            return
 
-        # TODO: Transition to loading scene or gameplay scene
-        # For now, just log the action
-        # self.request_scene_change(LoadingScene, data={
-        #     'difficulty': self._selected_difficulty
-        # })
+        current_level = self._progression_manager.get_current_level()
+        logger.info(f"Continuing game at level {current_level}")
+
+        # Transition to loading scene
+        from src.scenes.loading_scene import LoadingScene
+        self.request_scene_change(LoadingScene, data={
+            'level': current_level,
+            'difficulty': self._selected_difficulty,
+            'screen_width': self._screen_width,
+            'screen_height': self._screen_height
+        })
+
+    def _on_new_game_clicked(self) -> None:
+        """Handle new game button click."""
+        logger.info(f"Starting new game with difficulty: {self._selected_difficulty}")
+
+        # Start from level 1
+        from src.scenes.loading_scene import LoadingScene
+        self.request_scene_change(LoadingScene, data={
+            'level': 1,
+            'difficulty': self._selected_difficulty,
+            'screen_width': self._screen_width,
+            'screen_height': self._screen_height
+        })
 
     def _on_exit_clicked(self) -> None:
         """Handle exit button click."""

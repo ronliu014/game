@@ -17,6 +17,7 @@ from src.ui.components.image import Image
 from src.ui.layouts.layout_manager import LayoutManager
 from src.rendering.effects.fireworks_effect import FireworksEffect
 from src.rendering.effects.smoke_effect import SmokeEffect
+from src.progression.level_progression import LevelProgressionManager
 from src.utils.logger import GameLogger
 
 logger = GameLogger.get_logger(__name__)
@@ -80,6 +81,11 @@ class ResultScene(SceneBase):
         self._moves = 0
         self._stars = 0
         self._difficulty = 'normal'
+        self._is_new_best = False
+        self._unlocked_levels = []
+
+        # Progression manager
+        self._progression_manager: Optional[LevelProgressionManager] = None
 
         # Animation state
         self._animation_time = 0.0
@@ -124,6 +130,13 @@ class ResultScene(SceneBase):
         # Initialize layout manager
         self._layout = LayoutManager(self._screen_width, self._screen_height)
 
+        # Initialize progression manager
+        self._progression_manager = LevelProgressionManager()
+
+        # Save progress if victory
+        if self._is_victory:
+            self._save_progress()
+
         # Initialize particle effects
         self._fireworks_effect = FireworksEffect(self._screen_width, self._screen_height)
         self._smoke_effect = SmokeEffect(self._screen_width, self._screen_height)
@@ -151,6 +164,29 @@ class ResultScene(SceneBase):
             self._smoke_effect.start(panel_center_x, panel_center_y)
 
         logger.info(f"ResultScene entered: victory={self._is_victory}, level={self._level}, stars={self._stars}")
+
+    def _save_progress(self) -> None:
+        """Save level completion progress."""
+        if not self._progression_manager:
+            return
+
+        try:
+            # Complete the level and save progress
+            result = self._progression_manager.complete_level(
+                level_id=self._level,
+                stars=self._stars,
+                time=self._time_taken,
+                moves=self._moves,
+                auto_save=True
+            )
+
+            self._is_new_best = result['is_new_best']
+            self._unlocked_levels = result['unlocked_levels']
+
+            logger.info(f"Progress saved: new_best={self._is_new_best}, unlocked={self._unlocked_levels}")
+
+        except Exception as e:
+            logger.error(f"Failed to save progress: {e}")
 
     def on_exit(self) -> None:
         """Called when the scene is being replaced or removed."""
