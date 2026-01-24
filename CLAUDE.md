@@ -2,6 +2,8 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+⭐ The current project development environment is Windows.
+
 ## Python Environment
 
 This project uses the conda environment Game, with the path: D:\anaconda3\envs\Game.
