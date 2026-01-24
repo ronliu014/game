@@ -70,6 +70,7 @@ class MainMenuScene(SceneBase):
         self._start_button: Optional[Button] = None
         self._continue_button: Optional[Button] = None
         self._new_game_button: Optional[Button] = None
+        self._level_select_button: Optional[Button] = None
         self._exit_button: Optional[Button] = None
 
         # Layout manager
@@ -162,8 +163,12 @@ class MainMenuScene(SceneBase):
             button.draw(surface)
 
         # Draw action buttons
-        if self._start_button:
-            self._start_button.draw(surface)
+        if self._continue_button:
+            self._continue_button.draw(surface)
+        if self._new_game_button:
+            self._new_game_button.draw(surface)
+        if self._level_select_button:
+            self._level_select_button.draw(surface)
         if self._exit_button:
             self._exit_button.draw(surface)
 
@@ -188,6 +193,8 @@ class MainMenuScene(SceneBase):
         if self._continue_button and self._continue_button.handle_event(event):
             return True
         if self._new_game_button and self._new_game_button.handle_event(event):
+            return True
+        if self._level_select_button and self._level_select_button.handle_event(event):
             return True
         if self._exit_button and self._exit_button.handle_event(event):
             return True
@@ -347,7 +354,7 @@ class MainMenuScene(SceneBase):
         self._update_difficulty_buttons()
 
     def _create_buttons(self) -> None:
-        """Create action buttons (Continue, New Game, Exit)."""
+        """Create action buttons (Continue, New Game, Level Select, Exit)."""
         button_width = 200
         button_height = 60
 
@@ -381,6 +388,17 @@ class MainMenuScene(SceneBase):
             font_size=24
         )
         buttons.append(self._new_game_button)
+
+        # Create level select button
+        self._level_select_button = Button(
+            0, 0,
+            button_width,
+            button_height,
+            "关卡选择",
+            on_click=self._on_level_select_clicked,
+            font_size=24
+        )
+        buttons.append(self._level_select_button)
 
         # Create exit button
         self._exit_button = Button(
@@ -461,6 +479,16 @@ class MainMenuScene(SceneBase):
             'screen_width': self._screen_width,
             'screen_height': self._screen_height
         })
+
+    def _on_level_select_clicked(self) -> None:
+        """Handle level select button click."""
+        logger.info("Level select button clicked")
+
+        # Transition to level select scene
+        if self.scene_manager:
+            self.scene_manager.replace_scene('level_select', data={
+                'difficulty': self._selected_difficulty
+            })
 
     def _on_exit_clicked(self) -> None:
         """Handle exit button click."""
