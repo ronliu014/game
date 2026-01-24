@@ -1,0 +1,49 @@
+# UTF-8
+#
+# Version Information for Circuit Repair Game
+# 电路修复游戏版本信息
+#
+# This file is used by PyInstaller to embed version information
+# into the Windows executable.
+
+VSVersionInfo(
+  ffi=FixedFileInfo(
+    # File version (1.0.0.0)
+    filevers=(1, 0, 0, 0),
+    # Product version (1.0.0.0)
+    prodvers=(1, 0, 0, 0),
+    # File flags mask
+    mask=0x3f,
+    # File flags (0 = final version)
+    flags=0x0,
+    # File OS (VOS_NT_WINDOWS32)
+    OS=0x40004,
+    # File type (VFT_APP = application)
+    fileType=0x1,
+    # File subtype
+    subtype=0x0,
+    # Creation date
+    date=(0, 0)
+  ),
+  kids=[
+    StringFileInfo(
+      [
+      StringTable(
+        u'040904B0',
+        [
+          StringStruct(u'CompanyName', u'Circuit Repair Game Team'),
+          StringStruct(u'FileDescription', u'Circuit Repair Game - A puzzle game about connecting circuits'),
+          StringStruct(u'FileVersion', u'1.0.0.0'),
+          StringStruct(u'InternalName', u'CircuitRepairGame'),
+          StringStruct(u'LegalCopyright', u'Copyright (c) 2026 Circuit Repair Game Team. Licensed under MIT License.'),
+          StringStruct(u'OriginalFilename', u'CircuitRepairGame.exe'),
+          StringStruct(u'ProductName', u'Circuit Repair Game'),
+          StringStruct(u'ProductVersion', u'1.0.0.0'),
+          StringStruct(u'Comments', u'A steampunk-themed puzzle game where players rotate circuit pieces to connect power sources to terminals.'),
+        ]
+      )
+      ]
+    ),
+    VarFileInfo([VarStruct(u'Translation', [1033, 1200])])
+  ]
+)

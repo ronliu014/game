@@ -118,25 +118,28 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    
+
     # Application name
     name='CircuitRepairGame',
-    
+
     # Debug options
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
     console=False,  # No console window (GUI app)
-    
+
     # Windows-specific options
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    
-    # Icon file (will be created in next task)
+
+    # Version information (Windows only)
+    version='version_info.txt',
+
+    # Icon file
     icon=os.path.join(project_root, 'assets', 'icon.ico') if os.path.exists(os.path.join(project_root, 'assets', 'icon.ico')) else None,
 )
 
