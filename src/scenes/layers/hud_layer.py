@@ -162,7 +162,7 @@ class HUDLayer(LayerBase):
 
                 # Update timer color based on remaining time
                 color = self._timer.get_color_hint()
-                self._timer_label.set_color(color)
+                self._timer_label.set_text_color(color)
 
     def draw(self, surface: pygame.Surface) -> None:
         """

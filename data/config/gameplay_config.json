@@ -1,0 +1,106 @@
+{
+  "version": "1.0.0",
+  "description": "Gameplay scene configuration",
+
+  "layers": {
+    "background": {
+      "enabled": true,
+      "background_color": [20, 30, 40],
+      "parallax_speed": 0.0
+    },
+    "game": {
+      "enabled": true,
+      "grid_padding": 50
+    },
+    "hud": {
+      "enabled": true,
+      "panel_height": 60,
+      "panel_color": [30, 30, 40],
+      "panel_alpha": 220,
+      "border_color": [100, 100, 100],
+      "border_width": 2
+    },
+    "debug": {
+      "enabled": true,
+      "visible_by_default": false,
+      "toggle_key": "F3"
+    }
+  },
+
+  "timer": {
+    "default_time_limit": 60.0,
+    "warning_threshold": 10.0,
+    "critical_threshold": 5.0,
+    "color_normal": [0, 255, 0],
+    "color_warning": [255, 255, 0],
+    "color_critical": [255, 0, 0]
+  },
+
+  "hud_layout": {
+    "level_label": {
+      "x": 10,
+      "y": 10,
+      "width": 200,
+      "height": 40,
+      "font_size": 20,
+      "text_color": [200, 200, 200],
+      "alignment": "left"
+    },
+    "timer_label": {
+      "x_offset_from_center": -100,
+      "y": 10,
+      "width": 200,
+      "height": 40,
+      "font_size": 28,
+      "alignment": "center"
+    },
+    "moves_label": {
+      "x_offset_from_right": 250,
+      "y": 10,
+      "width": 150,
+      "height": 40,
+      "font_size": 20,
+      "text_color": [200, 200, 200],
+      "alignment": "right"
+    },
+    "pause_button": {
+      "x_offset_from_right": 90,
+      "y": 10,
+      "width": 80,
+      "height": 40,
+      "font_size": 18,
+      "text": "暂停"
+    }
+  },
+
+  "difficulty_settings": {
+    "easy": {
+      "time_multiplier": 1.5,
+      "hint_enabled": true
+    },
+    "normal": {
+      "time_multiplier": 1.0,
+      "hint_enabled": false
+    },
+    "hard": {
+      "time_multiplier": 0.75,
+      "hint_enabled": false
+    },
+    "hell": {
+      "time_multiplier": 0.5,
+      "hint_enabled": false
+    }
+  },
+
+  "performance": {
+    "target_fps": 60,
+    "max_update_time_ms": 16.67,
+    "max_draw_time_ms": 16.67
+  },
+
+  "controls": {
+    "pause_key": "ESCAPE",
+    "debug_toggle_key": "F3",
+    "quit_key": "Q"
+  }
+}
