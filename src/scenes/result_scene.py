@@ -544,24 +544,42 @@ class ResultScene(SceneBase):
     def _on_next_clicked(self) -> None:
         """Handle next level button click."""
         logger.info("Next level button clicked")
-        # TODO: Transition to next level
-        # self.request_scene_change(LoadingScene, data={
-        #     'next_scene': GameplayScene,
-        #     'level': self._level + 1,
-        #     'difficulty': self._difficulty
-        # })
+
+        # Get next level
+        next_level = self._level + 1
+
+        # Transition to loading scene for next level
+        from src.scenes.loading_scene import LoadingScene
+        self.request_scene_change(LoadingScene, data={
+            'level': next_level,
+            'difficulty': self._difficulty,
+            'screen_width': self._screen_width,
+            'screen_height': self._screen_height
+        })
 
     def _on_retry_clicked(self) -> None:
         """Handle retry button click."""
         logger.info("Retry button clicked")
-        # TODO: Restart current level
-        # self.request_scene_change(LoadingScene, data={
-        #     'next_scene': GameplayScene,
-        #     'level': self._level,
-        #     'difficulty': self._difficulty
-        # })
+
+        # Restart current level
+        from src.scenes.loading_scene import LoadingScene
+        self.request_scene_change(LoadingScene, data={
+            'level': self._level,
+            'difficulty': self._difficulty,
+            'screen_width': self._screen_width,
+            'screen_height': self._screen_height
+        })
 
     def _on_menu_clicked(self) -> None:
+        """Handle menu button click."""
+        logger.info("Menu button clicked")
+
+        # Return to main menu
+        from src.scenes.main_menu_scene import MainMenuScene
+        self.request_scene_change(MainMenuScene, data={
+            'screen_width': self._screen_width,
+            'screen_height': self._screen_height
+        })
         """Handle menu button click."""
         logger.info("Menu button clicked")
         # TODO: Return to main menu
