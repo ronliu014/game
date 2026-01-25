@@ -41,7 +41,8 @@
       "Bash(cd:*)",
       "Bash(D:anaconda3envsGamepython.exe:*)",
       "Bash(fc-list:*)",
-      "Bash(call conda activate Game)"
+      "Bash(call conda activate Game)",
+      "Bash(git restore:*)"
     ]
   }
 }

@@ -32,7 +32,8 @@ venv.bak/
 
 # PyInstaller
 *.manifest
-*.spec
+# Keep the main spec file but ignore backups
+*.spec.bak
 
 # Unit test / coverage reports
 htmlcov/
@@ -99,6 +100,10 @@ desktop.ini
 # Uncomment if you don't want to track certain assets
 # assets/temp/
 # assets/raw/
+
+# Save files
+data/saves/*.json
+data/saves/*.backup
 
 # Temporary files directory
 temp/
