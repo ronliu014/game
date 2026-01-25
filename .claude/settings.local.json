@@ -42,7 +42,18 @@
       "Bash(D:anaconda3envsGamepython.exe:*)",
       "Bash(fc-list:*)",
       "Bash(call conda activate Game)",
-      "Bash(git restore:*)"
+      "Bash(git restore:*)",
+      "Bash(cmd /c build.bat)",
+      "Bash(pip install:*)",
+      "Bash(if [ -d \"build\" ])",
+      "Bash(then rm -rf build)",
+      "Bash(fi)",
+      "Bash(if [ -d \"dist\" ])",
+      "Bash(then rm -rf dist)",
+      "Bash(pyinstaller:*)",
+      "Bash(tee:*)",
+      "Bash(./CircuitRepairGame.exe)",
+      "Bash(powershell -Command:*)"
     ]
   }
 }
