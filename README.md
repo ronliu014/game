@@ -65,9 +65,34 @@ python main.py
 - **测试框架**: pytest
 - **打包工具**: PyInstaller
 
-## 📝 更新日志
+## 📚 文档
 
-详见 [CHANGELOG.md](CHANGELOG.md)
+- **[用户指南](docs/USER_GUIDE.md)** - 详细的游戏说明和操作指南
+- **[构建说明](docs/BUILD.md)** - 如何从源码构建可执行文件
+- **[测试指南](docs/TESTING.md)** - 测试说明和测试用例
+- **[更新日志](CHANGELOG.md)** - 版本更新记录
+
+## 🛠️ 开发相关
+
+### 构建可执行文件
+
+```bash
+# Windows
+build.bat
+
+# Linux/Mac
+./build.sh
+```
+
+详细说明请参考 [构建文档](docs/BUILD.md)
+
+### 运行测试
+
+```bash
+pytest tests/ -v
+```
+
+详细说明请参考 [测试文档](docs/TESTING.md)
 
 ## 📄 许可证
 
