@@ -7,6 +7,7 @@
 """
 
 import os
+import sys
 from pathlib import Path
 from typing import Optional, List
 from src.utils.logger import get_logger
@@ -18,24 +19,41 @@ def get_project_root() -> Path:
     """
     获取项目根目录
 
+    在 PyInstaller 打包环境中，返回临时解压目录 (sys._MEIPASS)
+    在开发环境中，返回包含 src 和 data 目录的项目根目录
+
     Returns:
         Path: 项目根目录路径
 
     Example:
         >>> root = get_project_root()
         >>> root.name
-        'game'
+        'game'  # Development
+        >>> root.name
+        '_MEIxxxxxx'  # PyInstaller packaged
     """
-    # 从当前文件向上查找，直到找到包含特定标记文件的目录
+    # Check if running in PyInstaller bundle
+    # 检查是否在 PyInstaller 打包环境中运行
+    if hasattr(sys, '_MEIPASS'):
+        # Return the temporary folder where PyInstaller extracts files
+        # 返回 PyInstaller 解压文件的临时文件夹
+        root = Path(sys._MEIPASS)
+        logger.debug(f"Running in PyInstaller bundle, root: {root}")
+        return root
+
+    # Development environment - find project root by looking for src and data directories
+    # 开发环境 - 通过查找 src 和 data 目录来定位项目根目录
     current = Path(__file__).resolve()
 
     # 向上查找，直到找到包含 src 目录的父目录
     while current.parent != current:
         if (current / 'src').exists() and (current / 'data').exists():
+            logger.debug(f"Found project root: {current}")
             return current
         current = current.parent
 
     # 如果找不到，返回当前工作目录
+    logger.warning("Could not find project root, using current working directory")
     return Path.cwd()
 
 
