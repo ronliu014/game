@@ -25,10 +25,28 @@ Write-Host ""
 
 # Check if dist directory exists
 if (-not (Test-Path "dist\CircuitRepairGame")) {
-    Write-Host "ERROR: dist\CircuitRepairGame not found" -ForegroundColor Red
-    Write-Host "Please run build.bat first to create the package" -ForegroundColor Yellow
-    Read-Host "Press Enter to exit"
-    exit 1
+    Write-Host "dist\CircuitRepairGame not found" -ForegroundColor Yellow
+    Write-Host "Running build.bat to create the package..." -ForegroundColor Yellow
+    Write-Host ""
+
+    # Run build.bat
+    $buildProcess = Start-Process -FilePath "cmd.exe" -ArgumentList "/c build.bat" -Wait -PassThru -NoNewWindow
+
+    if ($buildProcess.ExitCode -ne 0) {
+        Write-Host "ERROR: Build failed" -ForegroundColor Red
+        Read-Host "Press Enter to exit"
+        exit 1
+    }
+
+    # Check again if dist directory was created
+    if (-not (Test-Path "dist\CircuitRepairGame")) {
+        Write-Host "ERROR: Build completed but dist\CircuitRepairGame still not found" -ForegroundColor Red
+        Read-Host "Press Enter to exit"
+        exit 1
+    }
+
+    Write-Host "Build completed successfully!" -ForegroundColor Green
+    Write-Host ""
 }
 
 # Create release directory
