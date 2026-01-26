@@ -41,7 +41,28 @@
       "Bash(cd:*)",
       "Bash(D:anaconda3envsGamepython.exe:*)",
       "Bash(fc-list:*)",
-      "Bash(git merge feature/v1.0.0-upgrade --no-ff -m \"$\\(cat <<''EOF''\nMerge branch ''feature/v1.0.0-upgrade'' into main\n\nRelease v1.0.1 - Complete game implementation with bug fixes\n\nMajor Features:\n- Infinite procedurally generated levels\n- 4 difficulty levels \\(Easy, Normal, Hard, Expert\\)\n- Countdown timer challenge\n- Move counter and scoring system\n- Particle effects and animations\n- Sound effects and background music\n- Debug mode toggle \\(F3/D key or HUD button\\)\n\nBug Fixes:\n- Fixed HUD flickering issue\n- Fixed keyboard shortcuts not working\n- Improved logging system with timestamps\n- Optimized rendering performance\n- Debug mode now defaults to OFF\n\nTechnical Improvements:\n- Self-contained executable packaging\n- Comprehensive documentation\n- Automated release scripts\n- Package verification tools\n\nRelease Package:\n- File: CircuitRepairGame-v1.0.1-win64.zip\n- Size: 24.3 MB\n- SHA256: 2756953f79ee1283e336d40b927ecb65f4255cb7891d845e31348e959c362642\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
+      "Bash(call conda activate Game)",
+      "Bash(git restore:*)",
+      "Bash(cmd /c build.bat)",
+      "Bash(pip install:*)",
+      "Bash(if [ -d \"build\" ])",
+      "Bash(then rm -rf build)",
+      "Bash(fi)",
+      "Bash(if [ -d \"dist\" ])",
+      "Bash(then rm -rf dist)",
+      "Bash(pyinstaller:*)",
+      "Bash(tee:*)",
+      "Bash(./CircuitRepairGame.exe)",
+      "Bash(powershell -Command:*)",
+      "Bash(grep:*)",
+      "Bash(findstr:*)",
+      "Bash(timeout /t 3)",
+      "Bash(xargs ls:*)",
+      "Bash(powershell -ExecutionPolicy Bypass -File create_release.ps1:*)",
+      "Bash(certutil -hashfile:*)",
+      "Bash(build.bat)",
+      "Bash(./create_release.ps1)",
+      "Bash(git merge:*)"
     ]
   }
 }

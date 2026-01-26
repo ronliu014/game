@@ -69,6 +69,9 @@ class GameController:
         self._infinite_mode: bool = True  # Always use infinite mode
         self._logger: GameLogger = GameLogger.get_logger(__name__)
 
+        # Debug settings
+        self._show_debug_info: bool = False  # Toggle for showing rotation debug info (default: OFF)
+
     def initialize(self, width: int = 800, height: int = 600) -> bool:
         """
         Initialize all game systems.
@@ -142,6 +145,33 @@ class GameController:
             str: Current difficulty level
         """
         return self._difficulty
+
+    def get_move_count(self) -> int:
+        """
+        Get the current move count.
+
+        Returns:
+            int: Number of moves made
+        """
+        return self._level_manager.get_move_count()
+
+    def is_game_over(self) -> bool:
+        """
+        Check if the game is over.
+
+        Returns:
+            bool: True if game is over (victory)
+        """
+        return self._state_machine.get_current_state() == GameState.VICTORY
+
+    def is_victory(self) -> bool:
+        """
+        Check if the player has won.
+
+        Returns:
+            bool: True if player won
+        """
+        return self._level_manager.is_level_completed()
 
     def _update_grid_offset(self) -> None:
         """
@@ -445,7 +475,7 @@ class GameController:
                                 self._renderer.draw_sprite(sprite, screen_pos)
 
                             # Draw debug info: current rotation and target rotation
-                            if tile.is_clickable:
+                            if tile.is_clickable and self._show_debug_info:
                                 # Get accepted rotations from level data
                                 level_data = self._level_manager.get_level_data()
                                 accepted_rotations = []
@@ -482,22 +512,25 @@ class GameController:
                                 self._glow_effect.draw_glow_circle(surface, screen_pos[0], screen_pos[1],
                                                                    radius=32, glow_radius=15)
 
-        # Draw HUD
-        move_count = self._level_manager.get_move_count()
-
-        # Display difficulty
-        difficulty_display = {
-            "easy": "简单",
-            "normal": "普通",
-            "hard": "困难",
-            "hell": "地狱"
-        }.get(self._difficulty, self._difficulty)
-
-        self._renderer.draw_text(f"关卡 #{self._current_level_number} ({difficulty_display})", (10, 10))
-        self._renderer.draw_text(f"移动次数: {move_count}", (10, 40))
-
-        if self._state_machine.get_current_state() == GameState.VICTORY:
-            self._renderer.draw_text("VICTORY!", (300, 250), font_size=48, color=(255, 215, 0))
+        # NOTE: HUD rendering is now handled by HUDLayer in the scene system
+        # The following HUD code is commented out to avoid duplicate rendering
+        #
+        # # Draw HUD
+        # move_count = self._level_manager.get_move_count()
+        #
+        # # Display difficulty
+        # difficulty_display = {
+        #     "easy": "简单",
+        #     "normal": "普通",
+        #     "hard": "困难",
+        #     "hell": "地狱"
+        # }.get(self._difficulty, self._difficulty)
+        #
+        # self._renderer.draw_text(f"关卡 #{self._current_level_number} ({difficulty_display})", (10, 10))
+        # self._renderer.draw_text(f"移动次数: {move_count}", (10, 40))
+        #
+        # if self._state_machine.get_current_state() == GameState.VICTORY:
+        #     self._renderer.draw_text("VICTORY!", (300, 250), font_size=48, color=(255, 215, 0))
 
     def get_state(self) -> GameState:
         """
@@ -525,3 +558,27 @@ class GameController:
             Renderer: Renderer instance
         """
         return self._renderer
+
+    def toggle_debug_info(self) -> None:
+        """Toggle debug info display (rotation angles)."""
+        self._show_debug_info = not self._show_debug_info
+        self._logger.info(f"Debug info {'enabled' if self._show_debug_info else 'disabled'}")
+
+    def set_debug_info(self, show: bool) -> None:
+        """
+        Set debug info display state.
+
+        Args:
+            show: Whether to show debug info
+        """
+        self._show_debug_info = show
+        self._logger.info(f"Debug info set to: {show}")
+
+    def is_debug_info_enabled(self) -> bool:
+        """
+        Check if debug info is enabled.
+
+        Returns:
+            bool: True if debug info is shown, False otherwise
+        """
+        return self._show_debug_info
