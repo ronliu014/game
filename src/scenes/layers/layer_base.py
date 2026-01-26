@@ -100,6 +100,10 @@ class LayerBase(ABC):
         Args:
             visible: Whether the layer should be visible
         """
+        if self._visible != visible:
+            logger.warning(f"{self.__class__.__name__} visibility changed: {self._visible} -> {visible}")
+            import traceback
+            logger.warning(f"Visibility change stack trace:\n{''.join(traceback.format_stack())}")
         self._visible = visible
 
     def is_visible(self) -> bool:
@@ -118,6 +122,10 @@ class LayerBase(ABC):
         Args:
             enabled: Whether the layer should be enabled
         """
+        if self._enabled != enabled:
+            logger.warning(f"{self.__class__.__name__} enabled state changed: {self._enabled} -> {enabled}")
+            import traceback
+            logger.warning(f"Enabled change stack trace:\n{''.join(traceback.format_stack())}")
         self._enabled = enabled
 
     def is_enabled(self) -> bool:

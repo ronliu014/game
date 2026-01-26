@@ -70,6 +70,7 @@ class GameLogger:
             - 只会初始化一次，重复调用会被忽略
             - 如果配置文件不存在，使用默认配置
             - 自动创建logs目录
+            - 日志文件名使用时间戳格式：game_YYYY-MM-DD_HH-MM-SS.log
         """
         if cls._initialized:
             return
@@ -78,15 +79,35 @@ class GameLogger:
         log_dir = Path('logs')
         log_dir.mkdir(exist_ok=True)
 
+        # Generate timestamp for log filenames
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
         # 加载配置
         config_file = Path(config_path)
         if config_file.exists():
             try:
                 with open(config_file, 'r', encoding='utf-8') as f:
                     config = json.load(f)
+
+                # Replace log filenames with timestamped versions
+                if 'handlers' in config:
+                    if 'file' in config['handlers'] and 'filename' in config['handlers']['file']:
+                        config['handlers']['file']['filename'] = f'logs/game_{timestamp}.log'
+                    if 'error_file' in config['handlers'] and 'filename' in config['handlers']['error_file']:
+                        config['handlers']['error_file']['filename'] = f'logs/error_{timestamp}.log'
+                    if 'performance_file' in config['handlers'] and 'filename' in config['handlers']['performance_file']:
+                        config['handlers']['performance_file']['filename'] = f'logs/performance_{timestamp}.log'
+
                 logging.config.dictConfig(config)
+
+                # Log the log file locations
+                logger = logging.getLogger(__name__)
+                logger.info(f"Game log file: logs/game_{timestamp}.log")
+                logger.info(f"Error log file: logs/error_{timestamp}.log")
+                logger.info(f"Performance log file: logs/performance_{timestamp}.log")
+
             except Exception as e:
-                # 配置加载失败，使用默认配置
+                # 配置加��失败，使用默认配置
                 print(f"Warning: Failed to load logging config from {config_path}: {e}")
                 cls._setup_default_logging()
         else:
@@ -104,22 +125,42 @@ class GameLogger:
         """设置默认日志配置"""
         # Generate log filename with timestamp
         from datetime import datetime
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        log_filename = f'logs/game_{timestamp}.log'
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        game_log_filename = f'logs/game_{timestamp}.log'
+        error_log_filename = f'logs/error_{timestamp}.log'
 
-        logging.basicConfig(
-            level=logging.DEBUG,
-            format='[%(asctime)s] [%(levelname)s] [%(name)s] [%(funcName)s:%(lineno)d] - %(message)s',
-            datefmt='%Y-%m-%d %H:%M:%S',
-            handlers=[
-                logging.StreamHandler(),
-                logging.FileHandler(log_filename, encoding='utf-8')
-            ]
+        # Create handlers
+        console_handler = logging.StreamHandler()
+        console_handler.setLevel(logging.DEBUG)
+
+        # Game log handler (all levels)
+        game_file_handler = logging.FileHandler(game_log_filename, encoding='utf-8')
+        game_file_handler.setLevel(logging.DEBUG)
+
+        # Error log handler (only ERROR and CRITICAL)
+        error_file_handler = logging.FileHandler(error_log_filename, encoding='utf-8')
+        error_file_handler.setLevel(logging.ERROR)
+
+        # Set formatter
+        formatter = logging.Formatter(
+            '[%(asctime)s] [%(levelname)s] [%(name)s] [%(funcName)s:%(lineno)d] - %(message)s',
+            datefmt='%Y-%m-%d %H:%M:%S'
         )
+        console_handler.setFormatter(formatter)
+        game_file_handler.setFormatter(formatter)
+        error_file_handler.setFormatter(formatter)
 
-        # Log the log file location
+        # Configure root logger
+        root_logger = logging.getLogger()
+        root_logger.setLevel(logging.DEBUG)
+        root_logger.addHandler(console_handler)
+        root_logger.addHandler(game_file_handler)
+        root_logger.addHandler(error_file_handler)
+
+        # Log the log file locations
         logger = logging.getLogger(__name__)
-        logger.info(f"Log file created: {log_filename}")
+        logger.info(f"Game log file created: {game_log_filename}")
+        logger.info(f"Error log file created: {error_log_filename}")
 
     @staticmethod
     def get_logger(name: str) -> logging.Logger:

@@ -258,8 +258,11 @@ class LevelSelectScene(SceneBase):
         logger.info("Back to main menu")
 
         # Return to main menu
-        if self.scene_manager:
-            self.scene_manager.replace_scene('main_menu')
+        from src.scenes.main_menu_scene import MainMenuScene
+        self.request_scene_change(MainMenuScene, data={
+            'screen_width': self._screen_width,
+            'screen_height': self._screen_height
+        }, replace=True)
 
     def update(self, dt: float):
         """

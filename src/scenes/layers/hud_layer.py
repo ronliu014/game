@@ -49,7 +49,8 @@ class HUDLayer(LayerBase):
         level: int = 1,
         difficulty: str = 'normal',
         timer: Optional[GameTimer] = None,
-        on_pause: Optional[Callable[[], None]] = None
+        on_pause: Optional[Callable[[], None]] = None,
+        on_exit: Optional[Callable[[], None]] = None
     ):
         """
         Initialize the HUD layer.
@@ -61,6 +62,7 @@ class HUDLayer(LayerBase):
             difficulty: Difficulty level
             timer: GameTimer instance
             on_pause: Callback for pause button
+            on_exit: Callback for exit button
         """
         super().__init__(screen_width, screen_height)
 
@@ -69,13 +71,24 @@ class HUDLayer(LayerBase):
         self._timer = timer
         self._move_count = 0
         self._on_pause = on_pause
+        self._on_exit = on_exit
+        self._is_paused = False
+
+        # Cache for avoiding unnecessary updates
+        self._last_timer_text = ""
+        self._last_timer_color = (0, 255, 0)
 
         # UI components
         self._hud_panel: Optional[Panel] = None
         self._level_label: Optional[Label] = None
         self._timer_label: Optional[Label] = None
         self._moves_label: Optional[Label] = None
+        self._debug_button: Optional[Button] = None
         self._pause_button: Optional[Button] = None
+        self._exit_button: Optional[Button] = None
+
+        # Debug toggle callback
+        self._on_debug_toggle: Optional[Callable[[], None]] = None
 
         # Create UI
         self._create_ui()
@@ -127,15 +140,33 @@ class HUDLayer(LayerBase):
 
         # Moves label (right-center)
         self._moves_label = Label(
-            self._screen_width - 250, 10,
-            150, 40,
+            self._screen_width - 380, 10,
+            100, 40,
             f"移动: {self._move_count}",
             font_size=20,
             text_color=(200, 200, 200),
             alignment=Label.ALIGN_RIGHT
         )
 
-        # Pause button (far right)
+        # Debug button (right side, before exit/pause buttons)
+        self._debug_button = Button(
+            self._screen_width - 270, 10,
+            80, 40,
+            "调试",
+            on_click=self._on_debug_clicked,
+            font_size=18
+        )
+
+        # Exit button (far right)
+        self._exit_button = Button(
+            self._screen_width - 180, 10,
+            80, 40,
+            "退出",
+            on_click=self._on_exit_clicked,
+            font_size=18
+        )
+
+        # Pause button (next to exit button)
         self._pause_button = Button(
             self._screen_width - 90, 10,
             80, 40,
@@ -152,17 +183,25 @@ class HUDLayer(LayerBase):
             delta_ms: Time elapsed since last update in milliseconds
         """
         if not self._enabled:
+            logger.warning(f"HUD update skipped - layer disabled")
             return
 
-        # Update timer display
-        if self._timer:
+        # Update timer display (only if changed)
+        if self._timer and self._timer_label:
             timer_text = self._timer.format_time()
-            if self._timer_label:
-                self._timer_label.set_text(timer_text)
 
-                # Update timer color based on remaining time
-                color = self._timer.get_color_hint()
+            # Only update if text changed
+            if timer_text != self._last_timer_text:
+                logger.debug(f"Timer text changed: {self._last_timer_text} -> {timer_text}")
+                self._timer_label.set_text(timer_text)
+                self._last_timer_text = timer_text
+
+            # Only update color if changed
+            color = self._timer.get_color_hint()
+            if color != self._last_timer_color:
+                logger.debug(f"Timer color changed: {self._last_timer_color} -> {color}")
                 self._timer_label.set_text_color(color)
+                self._last_timer_color = color
 
     def draw(self, surface: pygame.Surface) -> None:
         """
@@ -172,7 +211,10 @@ class HUDLayer(LayerBase):
             surface: Pygame surface to draw on
         """
         if not self._visible:
+            logger.warning(f"HUD draw skipped - layer invisible")
             return
+
+        logger.debug(f"HUD drawing - visible={self._visible}, enabled={self._enabled}")
 
         # Draw HUD panel
         if self._hud_panel:
@@ -186,7 +228,11 @@ class HUDLayer(LayerBase):
         if self._moves_label:
             self._moves_label.draw(surface)
 
-        # Draw pause button
+        # Draw buttons
+        if self._debug_button:
+            self._debug_button.draw(surface)
+        if self._exit_button:
+            self._exit_button.draw(surface)
         if self._pause_button:
             self._pause_button.draw(surface)
 
@@ -202,6 +248,14 @@ class HUDLayer(LayerBase):
         """
         if not self._enabled:
             return False
+
+        # Handle debug button
+        if self._debug_button and self._debug_button.handle_event(event):
+            return True
+
+        # Handle exit button
+        if self._exit_button and self._exit_button.handle_event(event):
+            return True
 
         # Handle pause button
         if self._pause_button and self._pause_button.handle_event(event):
@@ -253,9 +307,55 @@ class HUDLayer(LayerBase):
 
     def _on_pause_clicked(self) -> None:
         """Handle pause button click."""
-        logger.info("Pause button clicked")
+        self._is_paused = not self._is_paused
+
+        # Update button text based on pause state
+        if self._pause_button:
+            if self._is_paused:
+                self._pause_button.set_label("继续")
+                logger.info("Game paused")
+            else:
+                self._pause_button.set_label("暂停")
+                logger.info("Game resumed")
+
+        # Call the pause callback
         if self._on_pause:
             self._on_pause()
+
+    def _on_exit_clicked(self) -> None:
+        """Handle exit button click."""
+        logger.info("Exit button clicked")
+        if self._on_exit:
+            self._on_exit()
+
+    def _on_debug_clicked(self) -> None:
+        """Handle debug button click."""
+        logger.info("Debug button clicked")
+        if self._on_debug_toggle:
+            self._on_debug_toggle()
+
+    def set_paused(self, is_paused: bool) -> None:
+        """
+        Set the pause state.
+
+        Args:
+            is_paused: Whether the game is paused
+        """
+        self._is_paused = is_paused
+        if self._pause_button:
+            if is_paused:
+                self._pause_button.set_label("继续")
+            else:
+                self._pause_button.set_label("暂停")
+
+    def is_paused(self) -> bool:
+        """
+        Get the pause state.
+
+        Returns:
+            bool: True if paused, False otherwise
+        """
+        return self._is_paused
 
     def set_pause_callback(self, callback: Callable[[], None]) -> None:
         """
@@ -267,3 +367,12 @@ class HUDLayer(LayerBase):
         self._on_pause = callback
         if self._pause_button:
             self._pause_button.set_on_click(callback)
+
+    def set_debug_toggle_callback(self, callback: Callable[[], None]) -> None:
+        """
+        Set debug toggle button callback.
+
+        Args:
+            callback: Function to call when debug button is clicked
+        """
+        self._on_debug_toggle = callback

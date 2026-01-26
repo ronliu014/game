@@ -5,10 +5,13 @@ External API for integrating the circuit repair game into other systems.
 
 Author: Circuit Repair Game Team
 Date: 2026-01-20
+Updated: 2026-01-25 - Added scene system integration
 """
 
 from typing import Optional, List, Callable, Dict, Any
-from src.integration.game_controller import GameController
+import pygame
+from src.scenes.scene_manager import SceneManager
+from src.scenes.main_menu_scene import MainMenuScene
 from src.integration.game_loop import GameLoop
 from src.core.game_state.game_state import GameState
 from src.utils.logger import GameLogger
@@ -31,15 +34,16 @@ class GameAPI:
             print("Game exited")
 
         api.start_game(
-            level_ids=["level_001", "level_002", "level_003"],
+            difficulty="normal",
             on_complete=on_complete,
             on_exit=on_exit
         )
         ```
 
     Attributes:
-        _controller (GameController): Game controller
+        _scene_manager (SceneManager): Scene manager for handling game scenes
         _game_loop (GameLoop): Game loop
+        _screen (pygame.Surface): Main display surface
         _on_complete_callback (Optional[Callable]): Completion callback
         _on_exit_callback (Optional[Callable]): Exit callback
         _logger (GameLogger): Logger instance
@@ -47,11 +51,14 @@ class GameAPI:
 
     def __init__(self):
         """Initialize the game API."""
-        self._controller: Optional[GameController] = None
+        self._scene_manager: Optional[SceneManager] = None
         self._game_loop: Optional[GameLoop] = None
+        self._screen: Optional[pygame.Surface] = None
         self._on_complete_callback: Optional[Callable[[Dict[str, Any]], None]] = None
         self._on_exit_callback: Optional[Callable[[], None]] = None
         self._logger: GameLogger = GameLogger.get_logger(__name__)
+        self._width: int = 800
+        self._height: int = 600
 
     def start_game(self,
                    difficulty: str = "normal",
@@ -61,10 +68,10 @@ class GameAPI:
                    height: int = 600,
                    fps: int = 60) -> bool:
         """
-        Start the game with infinite procedurally generated levels.
+        Start the game with complete UI flow (Main Menu -> Loading -> Gameplay -> Result).
 
         Args:
-            difficulty: Difficulty level ("easy", "normal", "hard", "hell")
+            difficulty: Default difficulty level ("easy", "normal", "hard", "hell")
             on_complete: Callback function called when all levels are completed.
                         Receives a dict with game statistics.
             on_exit: Callback function called when game exits (user closes window)
@@ -87,37 +94,121 @@ class GameAPI:
             )
             ```
         """
-        # Store callbacks
+        # Store callbacks and settings
         self._on_complete_callback = on_complete
         self._on_exit_callback = on_exit
+        self._width = width
+        self._height = height
 
-        # Create game controller
-        self._controller = GameController()
-
-        # Initialize game systems
-        if not self._controller.initialize(width, height):
-            self._logger.error("Failed to initialize game controller")
+        # Initialize Pygame
+        if not self._initialize_pygame(width, height):
+            self._logger.error("Failed to initialize Pygame")
             return False
 
-        # Start game with infinite level generation
-        if not self._controller.start_game(difficulty=difficulty):
-            self._logger.error("Failed to start game")
-            self._controller.shutdown()
-            return False
+        # Create scene manager
+        self._scene_manager = SceneManager()
+        self._logger.info("SceneManager created")
+
+        # Push main menu scene as the initial scene
+        initial_data = {
+            'screen_width': width,
+            'screen_height': height,
+            'default_difficulty': difficulty,
+            'on_complete_callback': on_complete,
+            'on_exit_callback': on_exit
+        }
+        self._logger.info(f"Pushing MainMenuScene with data: {initial_data}")
+        self._scene_manager.push_scene(MainMenuScene, data=initial_data, transition=False)
+        self._logger.info(f"MainMenuScene pushed. Current scene: {self._scene_manager.get_current_scene()}")
 
         # Create and start game loop
         self._game_loop = GameLoop(target_fps=fps)
 
         try:
-            self._game_loop.run(self._controller)
+            self._run_scene_loop()
         except Exception as e:
-            self._logger.error(f"Game loop error: {e}")
+            self._logger.error(f"Game loop error: {e}", exc_info=True)
             return False
         finally:
             # Cleanup
             self._handle_game_end()
 
         return True
+
+    def _initialize_pygame(self, width: int, height: int) -> bool:
+        """
+        Initialize Pygame and create display window.
+
+        Args:
+            width: Window width
+            height: Window height
+
+        Returns:
+            bool: True if successful, False otherwise
+        """
+        try:
+            pygame.init()
+            pygame.mixer.init()
+
+            # Create display window
+            self._screen = pygame.display.set_mode((width, height))
+            pygame.display.set_caption("电路板修复游戏 - Circuit Repair Game")
+
+            self._logger.info(f"Pygame initialized: {width}x{height}")
+            return True
+        except Exception as e:
+            self._logger.error(f"Failed to initialize Pygame: {e}", exc_info=True)
+            return False
+
+    def _run_scene_loop(self) -> None:
+        """
+        Run the main game loop with scene manager.
+        """
+        self._logger.info(f"Starting scene loop. Current scene: {self._scene_manager.get_current_scene()}")
+        self._logger.info(f"Scene stack size: {self._scene_manager.get_stack_size()}")
+
+        self._game_loop.start()
+        clock = pygame.time.Clock()
+
+        while self._game_loop.is_running():
+            # Get delta time
+            delta_ms = clock.get_time()
+
+            # Handle events
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self._game_loop.stop()
+                    break
+
+                # Pass event to scene manager
+                if self._scene_manager:
+                    self._scene_manager.handle_event(event)
+
+            # Check if scene stack is empty (all scenes exited)
+            if self._scene_manager and self._scene_manager.is_empty():
+                self._logger.info("Scene stack empty, exiting game")
+                self._game_loop.stop()
+                break
+
+            # Update scene manager
+            if self._game_loop.is_running() and self._scene_manager:
+                self._scene_manager.update(delta_ms)
+
+            # Render
+            if self._game_loop.is_running() and self._scene_manager:
+                # Clear screen
+                self._screen.fill((0, 0, 0))
+
+                # Draw current scene
+                self._scene_manager.draw(self._screen)
+
+                # Update display
+                pygame.display.flip()
+
+            # Cap frame rate
+            clock.tick(self._game_loop.get_target_fps())
+
+        self._logger.info("Scene loop ended")
 
     def stop_game(self) -> None:
         """
@@ -136,46 +227,33 @@ class GameAPI:
         Returns:
             Dict containing:
                 - is_running (bool): Whether game is running
-                - current_state (str): Current game state
-                - current_level (int): Current level number (1-indexed)
-                - difficulty (str): Current difficulty level
-                - move_count (int): Moves in current level
-                - fps (float): Current FPS
+                - current_scene (str): Current scene name
+                - stack_size (int): Number of scenes in stack
 
         Example:
             ```python
             status = api.get_status()
-            print(f"Level #{status['current_level']} ({status['difficulty']})")
-            print(f"Moves: {status['move_count']}")
+            print(f"Current scene: {status['current_scene']}")
             ```
         """
-        if not self._controller or not self._game_loop:
+        if not self._scene_manager or not self._game_loop:
             return {
                 "is_running": False,
-                "current_state": "not_started",
-                "current_level": 0,
-                "difficulty": "normal",
-                "move_count": 0,
-                "fps": 0.0
+                "current_scene": "none",
+                "stack_size": 0
             }
 
-        level_manager = self._controller.get_level_manager()
+        current_scene = self._scene_manager.get_current_scene()
+        scene_name = current_scene.__class__.__name__ if current_scene else "none"
 
         return {
             "is_running": self._game_loop.is_running(),
-            "current_state": self._controller.get_state().value,
-            "current_level": self._controller._current_level_number,
-            "difficulty": self._controller.get_difficulty(),
-            "move_count": level_manager.get_move_count() if level_manager else 0,
-            "fps": self._game_loop.get_fps()
+            "current_scene": scene_name,
+            "stack_size": self._scene_manager.get_stack_size()
         }
 
     def _handle_game_end(self) -> None:
         """Handle game end (completion or exit)."""
-        if not self._controller:
-            return
-
-        # In infinite mode, game never "completes" - only exits
         # Call exit callback
         if self._on_exit_callback:
             try:
@@ -183,29 +261,18 @@ class GameAPI:
             except Exception as e:
                 self._logger.error(f"Error in exit callback: {e}")
 
-        # Shutdown
-        self._controller.shutdown()
-        self._controller = None
+        # Cleanup scene manager
+        if self._scene_manager:
+            self._scene_manager.clear_stack()
+            self._scene_manager = None
+
+        # Cleanup pygame
+        pygame.quit()
+
         self._game_loop = None
+        self._screen = None
 
-    def _gather_statistics(self) -> Dict[str, Any]:
-        """
-        Gather game statistics.
-
-        Returns:
-            Dict containing game statistics
-        """
-        if not self._controller:
-            return {}
-
-        level_manager = self._controller.get_level_manager()
-
-        return {
-            "levels_completed": self._controller._current_level_number,
-            "difficulty": self._controller.get_difficulty(),
-            "total_moves": level_manager.get_move_count() if level_manager else 0,
-            "final_state": self._controller.get_state().value
-        }
+        self._logger.info("Game API cleanup completed")
 
     def is_running(self) -> bool:
         """

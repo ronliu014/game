@@ -550,11 +550,20 @@ class ResultScene(SceneBase):
 
         # Transition to loading scene for next level
         from src.scenes.loading_scene import LoadingScene
+        from src.scenes.gameplay_scene import GameplayScene
+
         self.request_scene_change(LoadingScene, data={
             'level': next_level,
             'difficulty': self._difficulty,
             'screen_width': self._screen_width,
-            'screen_height': self._screen_height
+            'screen_height': self._screen_height,
+            'next_scene': GameplayScene,
+            'next_scene_data': {
+                'level': next_level,
+                'difficulty': self._difficulty,
+                'screen_width': self._screen_width,
+                'screen_height': self._screen_height
+            }
         })
 
     def _on_retry_clicked(self) -> None:
@@ -563,11 +572,20 @@ class ResultScene(SceneBase):
 
         # Restart current level
         from src.scenes.loading_scene import LoadingScene
+        from src.scenes.gameplay_scene import GameplayScene
+
         self.request_scene_change(LoadingScene, data={
             'level': self._level,
             'difficulty': self._difficulty,
             'screen_width': self._screen_width,
-            'screen_height': self._screen_height
+            'screen_height': self._screen_height,
+            'next_scene': GameplayScene,
+            'next_scene_data': {
+                'level': self._level,
+                'difficulty': self._difficulty,
+                'screen_width': self._screen_width,
+                'screen_height': self._screen_height
+            }
         })
 
     def _on_menu_clicked(self) -> None:

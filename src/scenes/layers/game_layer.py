@@ -79,17 +79,33 @@ class GameLayer(LayerBase):
         Args:
             surface: Pygame surface to draw on
         """
-        if not self._visible or not self._game_controller or not self._game_surface:
+        if not self._visible or not self._game_controller:
             return
 
-        # Clear game surface
-        self._game_surface.fill((0, 0, 0))
+        # IMPORTANT: Do NOT call game_controller.draw() here!
+        # That method clears the screen and calls present(), which causes flickering
+        # when used in a layered rendering system.
+        #
+        # Instead, we directly call the internal _draw_game() method which only
+        # draws the game content without clearing or presenting.
 
-        # Draw game to game surface
-        self._game_controller.draw(self._game_surface)
+        # Temporarily set the renderer's screen to our surface
+        renderer = self._game_controller._renderer
+        original_screen = renderer._screen
 
-        # Blit game surface to main surface
-        surface.blit(self._game_surface, (0, 0))
+        try:
+            # Set our surface as the render target
+            renderer._screen = surface
+
+            # Draw game content only (no clear, no present)
+            self._game_controller._draw_game()
+
+            # Draw particles on our surface
+            self._game_controller._particle_system.draw(surface)
+
+        finally:
+            # Restore original screen
+            renderer._screen = original_screen
 
     def handle_event(self, event: pygame.event.Event) -> bool:
         """

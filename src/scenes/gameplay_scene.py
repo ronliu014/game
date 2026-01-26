@@ -113,6 +113,30 @@ class GameplayScene(SceneBase):
         # Get or create game controller
         self._game_controller = self.get_transition_data('game_controller', None)
 
+        # If no game controller provided, create one
+        if self._game_controller is None:
+            logger.info(f"Creating new GameController for level {self._level}")
+            self._game_controller = GameController()
+
+            # Initialize the game controller
+            if not self._game_controller.initialize(self._screen_width, self._screen_height):
+                logger.error("Failed to initialize GameController")
+                # TODO: Handle error - maybe show error scene or return to menu
+                return
+
+            # Set difficulty and start game
+            self._game_controller.set_difficulty(self._difficulty)
+
+            # Start the game (loads first level)
+            if not self._game_controller.start_game(self._difficulty):
+                logger.error(f"Failed to start game with difficulty {self._difficulty}")
+                # TODO: Handle error
+                return
+
+            logger.info(f"GameController initialized and started successfully")
+        else:
+            logger.info("Using provided GameController")
+
         # Create game timer
         self._game_timer = GameTimer(self._time_limit)
         self._game_timer.set_timeout_callback(self._on_timeout)
@@ -193,9 +217,14 @@ class GameplayScene(SceneBase):
         Returns:
             bool: True if the event was handled, False otherwise
         """
-        # Handle pause key (ESC)
+        # Handle keyboard shortcuts FIRST (before passing to layers)
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
+            # Toggle debug info (F3 or D key)
+            if event.key == pygame.K_F3 or event.key == pygame.K_d:
+                self._toggle_debug_info()
+                return True
+            # Handle pause key (ESC)
+            elif event.key == pygame.K_ESCAPE:
                 self._toggle_pause()
                 return True
 
@@ -229,8 +258,13 @@ class GameplayScene(SceneBase):
             level=self._level,
             difficulty=self._difficulty,
             timer=self._game_timer,
-            on_pause=self._toggle_pause
+            on_pause=self._toggle_pause,
+            on_exit=self._on_exit_clicked
         )
+
+        # Set debug toggle callback for HUD layer
+        if self._hud_layer:
+            self._hud_layer.set_debug_toggle_callback(self._toggle_debug_info)
 
         # 4. Debug Layer
         self._debug_layer = DebugLayer(
@@ -272,7 +306,26 @@ class GameplayScene(SceneBase):
             else:
                 self._game_timer.resume()
 
+        # Update HUD layer pause state
+        if self._hud_layer:
+            self._hud_layer.set_paused(self._is_paused)
+
         logger.info(f"Game {'paused' if self._is_paused else 'resumed'}")
+
+    def _on_exit_clicked(self) -> None:
+        """Handle exit button click - return to main menu."""
+        logger.info("Exit button clicked - returning to main menu")
+
+        # Stop timer
+        if self._game_timer:
+            self._game_timer.stop()
+
+        # Return to main menu
+        from src.scenes.main_menu_scene import MainMenuScene
+        self.request_scene_change(MainMenuScene, data={
+            'screen_width': self._screen_width,
+            'screen_height': self._screen_height
+        }, replace=True)
 
     def _on_timeout(self) -> None:
         """Handle timer timeout."""
@@ -326,6 +379,13 @@ class GameplayScene(SceneBase):
 
         if self._game_controller:
             self._debug_layer.set_debug_value('Moves', self._game_controller.get_move_count())
+
+    def _toggle_debug_info(self) -> None:
+        """Toggle debug info display on tiles."""
+        if self._game_controller:
+            self._game_controller.toggle_debug_info()
+            is_enabled = self._game_controller.is_debug_info_enabled()
+            logger.info(f"Debug info {'enabled' if is_enabled else 'disabled'}")
 
     def is_paused(self) -> bool:
         """

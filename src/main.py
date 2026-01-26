@@ -111,8 +111,10 @@ def main():
     # Parse command line arguments
     args = parse_arguments()
 
-    # Initialize logger
+    # Initialize logger system first
+    GameLogger.initialize()
     logger = GameLogger.get_logger(__name__)
+    logger.info("Game starting...")
 
     # Initialize configuration
     ConfigManager.initialize('data/config/game_config.json')
