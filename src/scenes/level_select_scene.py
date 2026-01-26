@@ -243,10 +243,17 @@ class LevelSelectScene(SceneBase):
         """
         logger.info(f"Level {level_id} selected")
 
+        # Check if level is unlocked (safety check)
+        progress = self._progression_manager.get_progress()
+        if not progress.is_level_unlocked(level_id):
+            logger.warning(f"Attempted to start locked level {level_id}")
+            return
+
         # Transition to gameplay scene
+        from src.scenes.gameplay_scene import GameplayScene
         if self.scene_manager:
             self.scene_manager.replace_scene(
-                'gameplay',
+                GameplayScene,
                 {
                     'level': level_id,
                     'difficulty': self._difficulty
