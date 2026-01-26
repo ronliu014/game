@@ -14,6 +14,7 @@ from src.scenes.scene_base import SceneBase
 from src.ui.components.button import Button
 from src.ui.components.panel import Panel
 from src.ui.components.label import Label
+from src.ui.components.dialog import Dialog
 from src.ui.layouts.layout_manager import LayoutManager
 from src.progression.level_progression import LevelProgressionManager
 from src.progression.progress_data import LevelProgress
@@ -70,6 +71,7 @@ class LevelSelectScene(SceneBase):
         self._level_labels: Dict[int, Label] = {}
         self._star_labels: Dict[int, Label] = {}
         self._back_button: Optional[Button] = None
+        self._locked_dialog: Optional[Dialog] = None
 
         # Layout manager
         self._layout: Optional[LayoutManager] = None
@@ -177,6 +179,7 @@ class LevelSelectScene(SceneBase):
             level_progress = progress.get_level_progress(level_id)
 
             # Create level button
+            # Note: All buttons are enabled to allow showing locked dialog
             button = Button(
                 x=x,
                 y=y,
@@ -186,7 +189,8 @@ class LevelSelectScene(SceneBase):
                 on_click=lambda lid=level_id: self._on_level_clicked(lid),
                 text_color=(100, 100, 110) if not is_unlocked else (255, 255, 255)
             )
-            button.enabled = is_unlocked
+            # Keep button enabled even if locked, so we can show dialog
+            button.enabled = True
 
             # Style based on unlock status
             if not is_unlocked:
@@ -243,10 +247,12 @@ class LevelSelectScene(SceneBase):
         """
         logger.info(f"Level {level_id} selected")
 
-        # Check if level is unlocked (safety check)
+        # Check if level is unlocked
         progress = self._progression_manager.get_progress()
         if not progress.is_level_unlocked(level_id):
             logger.warning(f"Attempted to start locked level {level_id}")
+            # Show locked dialog
+            self._show_locked_dialog(level_id)
             return
 
         # Transition to gameplay scene
@@ -259,6 +265,29 @@ class LevelSelectScene(SceneBase):
                     'difficulty': self._difficulty
                 }
             )
+
+    def _show_locked_dialog(self, level_id: int):
+        """
+        Show dialog for locked level.
+
+        Args:
+            level_id: ID of the locked level
+        """
+        if not self._locked_dialog:
+            self._locked_dialog = Dialog(
+                screen_width=self._screen_width,
+                screen_height=self._screen_height,
+                title="关卡未解锁 (Level Locked)",
+                message=f"关卡 {level_id} 尚未解锁\n请先完成前面的关卡\n\nLevel {level_id} is locked\nPlease complete previous levels first",
+                on_close=None
+            )
+        else:
+            self._locked_dialog.set_message(
+                f"关卡 {level_id} 尚未解锁\n请先完成前面的关卡\n\nLevel {level_id} is locked\nPlease complete previous levels first"
+            )
+
+        self._locked_dialog.show()
+        logger.info(f"Showing locked dialog for level {level_id}")
 
     def _on_back_clicked(self):
         """Handle back button click."""
@@ -284,6 +313,10 @@ class LevelSelectScene(SceneBase):
 
         if self._back_button:
             self._back_button.update(dt)
+
+        # Update dialog if visible
+        if self._locked_dialog:
+            self._locked_dialog.update(dt)
 
     def draw(self, screen: pygame.Surface):
         """
@@ -312,6 +345,10 @@ class LevelSelectScene(SceneBase):
         if self._back_button:
             self._back_button.draw(screen)
 
+        # Draw dialog on top (if visible)
+        if self._locked_dialog:
+            self._locked_dialog.draw(screen)
+
     def handle_event(self, event: pygame.event.Event):
         """
         Handle pygame events.
@@ -319,6 +356,11 @@ class LevelSelectScene(SceneBase):
         Args:
             event: Pygame event
         """
+        # Handle dialog events first (if visible, it's modal)
+        if self._locked_dialog and self._locked_dialog.visible:
+            self._locked_dialog.handle_event(event)
+            return  # Dialog consumes all events when visible
+
         # Handle level button events
         for button in self._level_buttons.values():
             button.handle_event(event)
