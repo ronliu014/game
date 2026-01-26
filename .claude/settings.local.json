@@ -57,7 +57,11 @@
       "Bash(grep:*)",
       "Bash(findstr:*)",
       "Bash(timeout /t 3)",
-      "Bash(xargs ls:*)"
+      "Bash(xargs ls:*)",
+      "Bash(powershell -ExecutionPolicy Bypass -File create_release.ps1:*)",
+      "Bash(certutil -hashfile:*)",
+      "Bash(build.bat)",
+      "Bash(./create_release.ps1)"
     ]
   }
 }
